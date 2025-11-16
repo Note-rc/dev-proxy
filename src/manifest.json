@@ -1,0 +1,48 @@
+{
+  "manifest_version": 3,
+  "name": "Dev Proxy",
+  "version": "1.8",
+  "description": "dev proxy",
+  "icons": {
+    "16": "assets/Tools.png",
+    "32": "assets/Tools.png",
+    "48": "assets/Tools.png",
+    "128": "assets/Tools.png"
+  },
+  "permissions": [
+    "storage",
+    "cookies",
+    "declarativeNetRequest",
+    "proxy"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "assets/proxyDocument.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ]
+}
