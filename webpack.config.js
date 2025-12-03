@@ -8,7 +8,6 @@ module.exports = {
     background: path.join(__dirname, "src/background.ts"),
     content: path.join(__dirname, "src/content.ts"),
     help: path.join(__dirname, "src/help.tsx"),
-    config: path.join(__dirname, "src/config.tsx"),
   },
   output: {
     path: path.join(__dirname, "dist"),
@@ -51,11 +50,6 @@ module.exports = {
       template: path.join(__dirname, "src/help.html"), // Create help.html
       filename: "help.html",
       chunks: ["help"],
-    }),
-    new HtmlWebpackPlugin({
-      template: path.join(__dirname, "src/config.html"), // Create config.html
-      filename: "config.html",
-      chunks: ["config"],
     }),
     new CopyWebpackPlugin({
       patterns: [
