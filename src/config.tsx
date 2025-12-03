@@ -516,60 +516,6 @@ const ProxyServerConfig: React.FC<{ initialValue: ProxyConfig | null }> = ({ ini
   );
 };
 
-// Cookie管理配置组件
-const CookieConfig: React.FC<{ initialValue: any }> = ({ initialValue }) => {
-  const [config, setConfig] = useState(initialValue || { sourceDomain: '', targetDomain: '' });
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-
-  const handleTransfer = async () => {
-    if (!config.sourceDomain || !config.targetDomain) {
-      setMessage('请填写源域名和目标域名');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      // 这里应该调用CookieManager.transferCookies
-      await chromeStore.set('cookieConfig', config);
-      setMessage('✅ Cookie配置已保存');
-      setTimeout(() => setMessage(''), 3000);
-    } catch (error) {
-      setMessage('❌ 保存失败');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className='space-y-4'>
-      <input
-        value={config.sourceDomain}
-        onChange={(e) => setConfig({ ...config, sourceDomain: e.target.value })}
-        placeholder='源域名（如：example.com）'
-        className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent'
-      />
-
-      <input
-        value={config.targetDomain}
-        onChange={(e) => setConfig({ ...config, targetDomain: e.target.value })}
-        placeholder='目标域名（如：localhost:3000）'
-        className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent'
-      />
-
-      <button
-        onClick={handleTransfer}
-        disabled={loading}
-        className='w-full py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-medium disabled:opacity-50'
-      >
-        {loading ? '处理中...' : '保存Cookie配置'}
-      </button>
-
-      {message && <div className='text-center text-sm font-medium'>{message}</div>}
-    </div>
-  );
-};
-
 // 主配置页面
 const ConfigPage: React.FC = () => {
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
@@ -577,7 +523,6 @@ const ConfigPage: React.FC = () => {
   const [proxyConfig, setProxyConfig] = useState<ProxyRule[]>([]);
   const [scriptConfig, setScriptConfig] = useState<ScriptRule[]>([]);
   const [redirectConfig, setRedirectConfig] = useState<RedirectRule[]>([]);
-  const [cookieConfig, setCookieConfig] = useState<any>(null);
 
   useEffect(() => {
     // 加载代理服务器配置
@@ -618,10 +563,6 @@ const ConfigPage: React.FC = () => {
         setRedirectConfig(Array.isArray(data) ? data : [data]);
       }
     });
-
-    chromeStore.get('cookieConfig').then((data) => {
-      if (data) setCookieConfig(data);
-    });
   }, []);
 
   const configs = [
@@ -656,14 +597,6 @@ const ConfigPage: React.FC = () => {
       color: '#8b5cf6',
       description: '将JS文件请求重定向到其他地址',
       component: <RedirectConfig initialValue={redirectConfig} />,
-    },
-    {
-      id: 'cookie',
-      title: 'Cookie管理',
-      icon: '🍪',
-      color: '#f59e0b',
-      description: '在不同域名之间复制Cookie信息',
-      component: <CookieConfig initialValue={cookieConfig} />,
     },
   ];
 

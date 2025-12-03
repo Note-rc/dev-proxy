@@ -3,22 +3,16 @@ import chromeStore from "../../tools/chromeStore";
 import RouteReplaceTool, { ProxyRule } from "./RouteReplaceTool";
 import ScriptTool, { ScriptRule } from "./ScriptTool";
 import RedirectTool, { RedirectRule } from "./RedirectTool";
-import CookieTool from "./CookieTool";
 import ProxyTool, { ProxyConfig } from "./ProxyTool";
 
 const Popup = () => {
   const [activeTab, setActiveTab] = useState<
-    "proxy" | "route" | "script" | "redirect" | "cookie"
+    "proxy" | "route" | "script" | "redirect"
   >("proxy");
   const [proxyServerConfig, setProxyServerConfig] = useState<ProxyConfig | null>(null);
   const [proxyConfig, setProxyConfig] = useState<ProxyRule[]>([]);
   const [scriptConfig, setScriptConfig] = useState<ScriptRule[]>([]);
   const [codeConfig, setCodeConfig] = useState<RedirectRule[]>([]);
-
-  const [cookieConfig, setCookieConfig] = useState<{
-    sourceDomain: string;
-    targetDomain: string;
-  } | null>(null);
 
   useEffect(() => {
     // 加载代理服务器配置
@@ -89,14 +83,6 @@ const Popup = () => {
         }
       }
     });
-
-    // 加载cookie配置
-    chromeStore.get("cookieConfig").then((data) => {
-      console.log("cookieConfig", data);
-      if (data) {
-        setCookieConfig(data);
-      }
-    });
   }, []);
 
   const handleProxyServerSubmit = (data: ProxyConfig) => {
@@ -121,14 +107,6 @@ const Popup = () => {
     console.log(data);
     chromeStore.set("codeConfig", data);
     setCodeConfig(data);
-  };
-
-  const handleCookieSubmit = (data: {
-    sourceDomain: string;
-    targetDomain: string;
-  }) => {
-    console.log(data);
-    chromeStore.set("cookieConfig", data);
   };
 
   return (
@@ -190,16 +168,6 @@ const Popup = () => {
         >
           js重定向
         </div>
-        <div
-          className={`px-3 py-2 cursor-pointer text-xs ${
-            activeTab === "cookie"
-              ? "text-[#233895] border-b-2 border-[#233895]"
-              : "text-[#666]"
-          }`}
-          onClick={() => setActiveTab("cookie")}
-        >
-          Cookie
-        </div>
       </div>
 
       {activeTab === "proxy" && (
@@ -219,10 +187,6 @@ const Popup = () => {
           onSubmit={handleRedirectSubmit}
           initialValue={codeConfig}
         />
-      )}
-
-      {activeTab === "cookie" && (
-        <CookieTool onSubmit={handleCookieSubmit} initialValue={cookieConfig} />
       )}
     </div>
   );
