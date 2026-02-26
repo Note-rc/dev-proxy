@@ -23,11 +23,22 @@ interface ScriptRule {
   enabled: boolean;
 }
 
+interface HeaderRule {
+  id: string;
+  headerName: string;
+  headerValue: string;
+  urlPattern: string;
+  enabled: boolean;
+}
+
 // 定义一个变量存储脚本配置（数组形式，支持多个规则）
 let scriptConfig: ScriptRule[] = [];
 
 // 定义一个变量存储重定向配置（数组形式，支持多个规则）
 let redirectConfig: RedirectRule[] = [];
+
+// 定义一个变量存储请求头配置（数组形式，支持多个规则）
+let headerConfig: HeaderRule[] = [];
 
 // 定义一个变量存储代理配置
 let proxyConfig: ProxyConfig | null = null;
@@ -36,6 +47,8 @@ let proxyConfig: ProxyConfig | null = null;
 const SCRIPT_REDIRECT_BASE_ID = 1000000;
 // URL重定向规则起始ID
 const URL_REDIRECT_BASE_ID = 2000000;
+// 请求头修改规则起始ID
+const HEADER_MODIFY_BASE_ID = 3000000;
 
 // 设置代理配置
 async function setProxyConfig(config: ProxyConfig) {
@@ -121,6 +134,7 @@ async function setProxyConfig(config: ProxyConfig) {
 const initConfig = async () => {
   const scriptData = await chromeStore.get("scriptConfig");
   const codeConfig = await chromeStore.get("codeConfig");
+  const headerData = await chromeStore.get("headerConfig");
   const proxyData = await chromeStore.get("proxyServerConfig");
 
   // 兼容旧数据：如果是单个对象，转换为数组
@@ -163,6 +177,13 @@ const initConfig = async () => {
     redirectConfig = [];
   }
 
+  // 初始化请求头配置
+  if (headerData && Array.isArray(headerData)) {
+    headerConfig = headerData;
+  } else {
+    headerConfig = [];
+  }
+
   // 初始化代理配置
   if (proxyData) {
     proxyConfig = proxyData as ProxyConfig;
@@ -177,6 +198,7 @@ const initConfig = async () => {
 
   console.log("🚀 ~ 初始化脚本替换配置:", scriptConfig);
   console.log("🚀 ~ 初始化重定向配置:", redirectConfig);
+  console.log("🚀 ~ 初始化请求头配置:", headerConfig);
   console.log("🚀 ~ 初始化代理配置:", proxyConfig);
   updateRedirectRules();
 };
@@ -266,6 +288,51 @@ async function updateRedirectRules() {
       });
     }
 
+    // 如果请求头修改功能启用，添加所有启用的请求头修改规则
+    if (headerConfig && Array.isArray(headerConfig)) {
+      headerConfig.forEach((rule, index) => {
+        if (rule.enabled && rule.headerName && rule.headerValue) {
+          const ruleId = HEADER_MODIFY_BASE_ID + index;
+
+          const condition: Record<string, any> = {
+            resourceTypes: [
+              "main_frame" as chrome.declarativeNetRequest.ResourceType,
+              "sub_frame" as chrome.declarativeNetRequest.ResourceType,
+              "xmlhttprequest" as chrome.declarativeNetRequest.ResourceType,
+              "stylesheet" as chrome.declarativeNetRequest.ResourceType,
+              "script" as chrome.declarativeNetRequest.ResourceType,
+              "image" as chrome.declarativeNetRequest.ResourceType,
+              "font" as chrome.declarativeNetRequest.ResourceType,
+              "other" as chrome.declarativeNetRequest.ResourceType,
+            ],
+          };
+
+          if (rule.urlPattern) {
+            condition.urlFilter = rule.urlPattern;
+          }
+
+          const headerRule = {
+            id: ruleId,
+            priority: 1,
+            action: {
+              type: "modifyHeaders" as chrome.declarativeNetRequest.RuleActionType,
+              requestHeaders: [
+                {
+                  header: rule.headerName,
+                  operation:
+                    "set" as chrome.declarativeNetRequest.HeaderOperation,
+                  value: rule.headerValue,
+                },
+              ],
+            },
+            condition,
+          };
+          rulesToAdd.push(headerRule);
+          console.log(`🚀 ~ 添加请求头修改规则 [${index}]:`, headerRule);
+        }
+      });
+    }
+
     // 批量添加规则
     if (rulesToAdd.length > 0) {
       await chrome.declarativeNetRequest.updateDynamicRules({
@@ -338,6 +405,18 @@ chrome.storage.onChanged.addListener((changes, area) => {
       shouldUpdate = true;
     }
 
+    // 监听请求头配置变化
+    if (newValue.headerConfig !== undefined) {
+      const headerData = newValue.headerConfig;
+      if (Array.isArray(headerData)) {
+        headerConfig = headerData;
+      } else {
+        headerConfig = [];
+      }
+      console.log("🚀 ~ 请求头配置已更新:", headerConfig);
+      shouldUpdate = true;
+    }
+
     // 监听代理配置变化
     if (newValue.proxyServerConfig !== undefined) {
       proxyConfig = newValue.proxyServerConfig as ProxyConfig;
@@ -361,6 +440,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     sendResponse(scriptConfig);
   } else if (message.action === "getRedirectConfig") {
     sendResponse(redirectConfig);
+  } else if (message.action === "getHeaderConfig") {
+    sendResponse(headerConfig);
   } else if (message.action === "getProxyConfig") {
     sendResponse(proxyConfig);
   } else if (message.action === "reportPageUrl" && sender.tab?.id) {

@@ -19,7 +19,7 @@ const HelpPage: React.FC = () => {
               onClick={() => {
                 window.open(
                   `chrome-extension://${chrome.runtime.id}/config.html`,
-                  "_blank"
+                  "_blank",
                 );
               }}
               className="px-6 py-3 bg-white text-[#233895] rounded-lg hover:bg-gray-100 transition-colors font-medium flex items-center gap-2 shadow-md"
@@ -56,20 +56,20 @@ const HelpPage: React.FC = () => {
           </h2>
           <p className="text-gray-700 mb-4">
             Dev Proxy
-            是一个强大的Chrome开发者工具扩展，提供了四大核心功能来帮助开发者提高工作效率：
+            是一个强大的Chrome开发者工具扩展，提供了五大核心功能来帮助开发者提高工作效率：
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="border border-gray-200 rounded p-4 hover:shadow-md transition-shadow">
               <h3 className="font-bold text-lg text-[#233895] mb-2">
-                🚀 代理服务器
+                📋 Header Modify
               </h3>
               <p className="text-gray-600 text-sm">
-                配置系统代理、直接连接或自定义代理服务器
+                为请求添加或修改自定义 Header，支持按 URL 匹配
               </p>
             </div>
             <div className="border border-gray-200 rounded p-4 hover:shadow-md transition-shadow">
               <h3 className="font-bold text-lg text-[#233895] mb-2">
-                📡 路由替换
+                📡 Route Replace
               </h3>
               <p className="text-gray-600 text-sm">
                 将特定前缀的URL请求代理到另一个地址
@@ -77,7 +77,7 @@ const HelpPage: React.FC = () => {
             </div>
             <div className="border border-gray-200 rounded p-4 hover:shadow-md transition-shadow">
               <h3 className="font-bold text-lg text-[#233895] mb-2">
-                📝 脚本替换
+                📝 Script Replace
               </h3>
               <p className="text-gray-600 text-sm">
                 替换页面中的JavaScript文件内容
@@ -85,7 +85,7 @@ const HelpPage: React.FC = () => {
             </div>
             <div className="border border-gray-200 rounded p-4 hover:shadow-md transition-shadow">
               <h3 className="font-bold text-lg text-[#233895] mb-2">
-                🔀 JS重定向
+                🔀 JS Redirect
               </h3>
               <p className="text-gray-600 text-sm">
                 将指定的JS文件请求重定向到其他地址
@@ -93,10 +93,10 @@ const HelpPage: React.FC = () => {
             </div>
             <div className="border border-gray-200 rounded p-4 hover:shadow-md transition-shadow">
               <h3 className="font-bold text-lg text-[#233895] mb-2">
-                🍪 Cookie管理
+                🚀 Proxy Server
               </h3>
               <p className="text-gray-600 text-sm">
-                在不同域名之间复制Cookie信息
+                配置系统代理、直接连接或自定义代理服务器
               </p>
             </div>
           </div>
@@ -143,10 +143,77 @@ const HelpPage: React.FC = () => {
           </div>
         </div>
 
+        {/* 请求头修改 */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <h2 className="text-2xl font-bold text-[#233895] mb-4">
+            📋 Header Modify
+          </h2>
+
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              功能说明
+            </h3>
+            <p className="text-gray-700 mb-2">
+              请求头修改功能允许你为浏览器发出的请求添加或覆盖自定义 HTTP
+              Header。支持多条规则，每条规则可以独立启用或禁用，并可限定仅对匹配特定
+              URL 的请求生效。
+            </p>
+          </div>
+
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              使用场景
+            </h3>
+            <ul className="list-disc list-inside text-gray-700 space-y-1 ml-4">
+              <li>为 API 请求注入自定义认证 Token（如 X-Auth-Token）</li>
+              <li>模拟不同的 User-Agent 或 Accept-Language</li>
+              <li>添加调试标记 Header，让后端返回特定的调试信息</li>
+              <li>测试 CORS 或其他基于 Header 的策略</li>
+            </ul>
+          </div>
+
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              配置说明
+            </h3>
+            <div className="bg-gray-50 p-4 rounded border border-gray-200">
+              <p className="text-sm text-gray-700 mb-2">
+                <strong>Header 名称：</strong>要设置的 HTTP Header 名称（如
+                X-Custom-Token）
+              </p>
+              <p className="text-sm text-gray-700 mb-2">
+                <strong>Header 值：</strong>Header 对应的值
+              </p>
+              <p className="text-sm text-gray-700">
+                <strong>URL 匹配：</strong>
+                可选项，留空则对所有请求生效；填写后仅对匹配该模式的 URL 生效
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">示例</h3>
+            <div className="bg-gray-900 text-white p-4 rounded font-mono text-sm">
+              <p className="text-green-400 mb-2">
+                # 示例1: 为所有请求添加认证 Token
+              </p>
+              <p>Header 名称: X-Auth-Token</p>
+              <p>Header 值: my-secret-token-123</p>
+              <p>URL 匹配: (留空)</p>
+              <p className="mt-3 text-green-400">
+                # 示例2: 仅对特定 API 添加 Header
+              </p>
+              <p>Header 名称: X-Debug-Mode</p>
+              <p>Header 值: true</p>
+              <p>URL 匹配: api.example.com</p>
+            </div>
+          </div>
+        </div>
+
         {/* 路由替换 */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <h2 className="text-2xl font-bold text-[#233895] mb-4">
-            📡 路由替换
+            📡 Route Replace
           </h2>
 
           <div className="mb-4">
@@ -207,7 +274,7 @@ const HelpPage: React.FC = () => {
         {/* 脚本替换 */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <h2 className="text-2xl font-bold text-[#233895] mb-4">
-            📝 脚本替换
+            📝 Script Replace
           </h2>
 
           <div className="mb-4">
@@ -266,7 +333,7 @@ const HelpPage: React.FC = () => {
         {/* JS重定向 */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <h2 className="text-2xl font-bold text-[#233895] mb-4">
-            🔀 JS重定向
+            🔀 JS Redirect
           </h2>
 
           <div className="mb-4">
@@ -318,9 +385,7 @@ const HelpPage: React.FC = () => {
 
         {/* Cookie管理 */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-2xl font-bold text-[#233895] mb-4">
-            🍪 Cookie管理
-          </h2>
+          <h2 className="text-2xl font-bold text-[#233895] mb-4">🍪 Cookie</h2>
 
           <div className="mb-4">
             <h3 className="text-lg font-semibold text-gray-800 mb-2">
@@ -441,7 +506,8 @@ const HelpPage: React.FC = () => {
                 2
               </span>
               <p className="text-gray-700">
-                选择需要使用的功能标签（路由替换/脚本替换/JS重定向/Cookie）
+                选择需要使用的功能标签（Header / Route / Script / Redirect /
+                Proxy）
               </p>
             </div>
             <div className="flex items-start">
@@ -461,7 +527,7 @@ const HelpPage: React.FC = () => {
 
         {/* 页脚 */}
         <div className="text-center text-gray-500 text-sm mt-8 pb-8">
-          <p>Dev Proxy v1.7</p>
+          <p>Dev Proxy v1.8</p>
           <p className="mt-2">开发者工具 · 提升开发效率</p>
         </div>
       </div>
@@ -470,6 +536,6 @@ const HelpPage: React.FC = () => {
 };
 
 const root = ReactDOM.createRoot(
-  document.getElementById("root") as HTMLElement
+  document.getElementById("root") as HTMLElement,
 );
 root.render(<HelpPage />);

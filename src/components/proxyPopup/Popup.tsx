@@ -3,16 +3,18 @@ import chromeStore from "../../tools/chromeStore";
 import RouteReplaceTool, { ProxyRule } from "./RouteReplaceTool";
 import ScriptTool, { ScriptRule } from "./ScriptTool";
 import RedirectTool, { RedirectRule } from "./RedirectTool";
+import HeaderTool, { HeaderRule } from "./HeaderTool";
 import ProxyTool, { ProxyConfig } from "./ProxyTool";
 
 const Popup = () => {
   const [activeTab, setActiveTab] = useState<
-    "proxy" | "route" | "script" | "redirect"
-  >("proxy");
+    "proxy" | "route" | "script" | "redirect" | "header"
+  >("header");
   const [proxyServerConfig, setProxyServerConfig] = useState<ProxyConfig | null>(null);
   const [proxyConfig, setProxyConfig] = useState<ProxyRule[]>([]);
   const [scriptConfig, setScriptConfig] = useState<ScriptRule[]>([]);
   const [codeConfig, setCodeConfig] = useState<RedirectRule[]>([]);
+  const [headerConfig, setHeaderConfig] = useState<HeaderRule[]>([]);
 
   useEffect(() => {
     // 加载代理服务器配置
@@ -83,6 +85,14 @@ const Popup = () => {
         }
       }
     });
+
+    // 加载请求头配置
+    chromeStore.get("headerConfig").then((data) => {
+      console.log("headerConfig", data);
+      if (data && Array.isArray(data)) {
+        setHeaderConfig(data);
+      }
+    });
   }, []);
 
   const handleProxyServerSubmit = (data: ProxyConfig) => {
@@ -109,6 +119,12 @@ const Popup = () => {
     setCodeConfig(data);
   };
 
+  const handleHeaderSubmit = (data: HeaderRule[]) => {
+    console.log(data);
+    chromeStore.set("headerConfig", data);
+    setHeaderConfig(data);
+  };
+
   return (
     <div className="w-[500px] bg-white font-[PingFang_SC] p-4 dev-tools-popup">
       <div className="h-10 flex items-center justify-between text-[#233895] text-xl">
@@ -130,13 +146,13 @@ const Popup = () => {
       <div className="flex items-center justify-between mb-4 border-b border-[#eee]">
         <div
           className={`px-3 py-2 cursor-pointer text-xs ${
-            activeTab === "proxy"
+            activeTab === "header"
               ? "text-[#233895] border-b-2 border-[#233895]"
               : "text-[#666]"
           }`}
-          onClick={() => setActiveTab("proxy")}
+          onClick={() => setActiveTab("header")}
         >
-          代理
+          Header
         </div>
         <div
           className={`px-3 py-2 cursor-pointer text-xs ${
@@ -146,7 +162,7 @@ const Popup = () => {
           }`}
           onClick={() => setActiveTab("route")}
         >
-          路由替换
+          Route
         </div>
         <div
           className={`px-3 py-2 cursor-pointer text-xs ${
@@ -156,7 +172,7 @@ const Popup = () => {
           }`}
           onClick={() => setActiveTab("script")}
         >
-          脚本替换
+          Script
         </div>
         <div
           className={`px-3 py-2 cursor-pointer text-xs ${
@@ -166,12 +182,25 @@ const Popup = () => {
           }`}
           onClick={() => setActiveTab("redirect")}
         >
-          js重定向
+          Redirect
+        </div>
+        <div
+          className={`px-3 py-2 cursor-pointer text-xs ${
+            activeTab === "proxy"
+              ? "text-[#233895] border-b-2 border-[#233895]"
+              : "text-[#666]"
+          }`}
+          onClick={() => setActiveTab("proxy")}
+        >
+          Proxy
         </div>
       </div>
 
-      {activeTab === "proxy" && (
-        <ProxyTool onSubmit={handleProxyServerSubmit} initialValue={proxyServerConfig} />
+      {activeTab === "header" && (
+        <HeaderTool
+          onSubmit={handleHeaderSubmit}
+          initialValue={headerConfig}
+        />
       )}
 
       {activeTab === "route" && (
@@ -187,6 +216,10 @@ const Popup = () => {
           onSubmit={handleRedirectSubmit}
           initialValue={codeConfig}
         />
+      )}
+
+      {activeTab === "proxy" && (
+        <ProxyTool onSubmit={handleProxyServerSubmit} initialValue={proxyServerConfig} />
       )}
     </div>
   );
