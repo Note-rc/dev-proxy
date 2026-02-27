@@ -6,6 +6,7 @@ import {
   Pencil1Icon,
   PlusIcon,
 } from "@radix-ui/react-icons";
+import t from "../../i18n";
 
 export interface ScriptRule {
   id: string;
@@ -47,12 +48,12 @@ const ScriptTool = ({ onSubmit, initialValue }: IProps) => {
     )?.trim();
 
     if (!scriptUrl) {
-      setMessage("请填写需要替换的JS URL");
+      setMessage(t("script.urlRequired"));
       return;
     }
 
     if (!replacementContent) {
-      setMessage("请填写替换的JS内容");
+      setMessage(t("script.contentRequired"));
       return;
     }
 
@@ -87,12 +88,11 @@ const ScriptTool = ({ onSubmit, initialValue }: IProps) => {
 
       // 显示成功提示
       setToastType("success");
-      setToastMessage("保存成功");
+      setToastMessage(t("common.saveSuccess"));
       setOpen(true);
     } catch (error) {
-      // 显示错误提示
       setToastType("error");
-      setToastMessage("保存失败");
+      setToastMessage(t("common.saveFailed"));
       setOpen(true);
     }
 
@@ -112,12 +112,12 @@ const ScriptTool = ({ onSubmit, initialValue }: IProps) => {
       setRules(newRules);
 
       setToastType("success");
-      setToastMessage("状态已更新");
+      setToastMessage(t("common.statusUpdated"));
       setOpen(true);
       setTimeout(() => setOpen(false), 3000);
     } catch (error) {
       setToastType("error");
-      setToastMessage("更新失败");
+      setToastMessage(t("common.updateFailed"));
       setOpen(true);
       setTimeout(() => setOpen(false), 3000);
     }
@@ -131,12 +131,12 @@ const ScriptTool = ({ onSubmit, initialValue }: IProps) => {
       setRules(newRules);
 
       setToastType("success");
-      setToastMessage("删除成功");
+      setToastMessage(t("common.deleteSuccess"));
       setOpen(true);
       setTimeout(() => setOpen(false), 3000);
     } catch (error) {
       setToastType("error");
-      setToastMessage("删除失败");
+      setToastMessage(t("common.deleteFailed"));
       setOpen(true);
       setTimeout(() => setOpen(false), 3000);
     }
@@ -160,12 +160,12 @@ const ScriptTool = ({ onSubmit, initialValue }: IProps) => {
         {/* 规则列表 */}
         <div className="mb-3">
           <div className="text-xs font-medium mb-2 text-[#666]">
-            已配置的脚本替换规则 ({rules.length})
+            {t("script.configuredRules")} ({rules.length})
           </div>
           <div className="max-h-[300px] overflow-y-auto">
             {rules.length === 0 ? (
               <div className="text-xs text-[#999] text-center py-4 border border-dashed border-[#ddd] rounded">
-                暂无规则，点击下方按钮添加
+                {t("common.noRulesHint")}
               </div>
             ) : (
               rules.map((rule) => (
@@ -186,11 +186,11 @@ const ScriptTool = ({ onSubmit, initialValue }: IProps) => {
                       </Checkbox.Root>
                       <div className="flex-1 min-w-0">
                         <div className="text-xs text-[#333] break-all">
-                          <span className="font-medium">脚本URL:</span>{" "}
+                          <span className="font-medium">{t("script.scriptUrlLabel")}:</span>{" "}
                           {rule.scriptUrl}
                         </div>
                         <div className="text-xs text-[#666] break-all mt-1 line-clamp-2">
-                          <span className="font-medium">替换内容:</span>{" "}
+                          <span className="font-medium">{t("script.replacementLabel")}:</span>{" "}
                           {rule.replacementContent.substring(0, 50)}
                           {rule.replacementContent.length > 50 ? "..." : ""}
                         </div>
@@ -200,14 +200,14 @@ const ScriptTool = ({ onSubmit, initialValue }: IProps) => {
                       <button
                         onClick={() => handleEdit(rule)}
                         className="p-1 text-[#233895] hover:bg-[#f0f0f0] rounded cursor-pointer"
-                        title="编辑"
+                        title={t("common.edit")}
                       >
                         <Pencil1Icon />
                       </button>
                       <button
                         onClick={() => handleDelete(rule.id)}
                         className="p-1 text-[#ff4d4f] hover:bg-[#fff2f0] rounded cursor-pointer"
-                        title="删除"
+                        title={t("common.delete")}
                       >
                         <TrashIcon />
                       </button>
@@ -226,19 +226,19 @@ const ScriptTool = ({ onSubmit, initialValue }: IProps) => {
             className="w-full flex items-center justify-center gap-1 text-xs p-2 bg-[#233895] text-white border-none rounded cursor-pointer hover:bg-[#1a2b75]"
           >
             <PlusIcon />
-            添加新规则
+            {t("common.addNewRule")}
           </button>
         ) : (
           <Form.Root className="w-full" onSubmit={handleSubmit}>
             <div className="text-xs font-medium mb-2 text-[#666]">
-              {editingRule ? "编辑规则" : "添加新规则"}
+              {editingRule ? t("common.editRule") : t("common.addNewRule")}
             </div>
 
             <Form.Field className="my-2 w-full" name="scriptUrl">
               <Form.Control asChild>
                 <input
                   name="scriptUrl"
-                  placeholder="需要替换的JS URL"
+                  placeholder={t("script.scriptUrlPlaceholder")}
                   defaultValue={editingRule?.scriptUrl || ""}
                   onChange={() => message && setMessage("")}
                   className="w-full box-border border border-[#ddd] rounded text-xs p-2"
@@ -250,7 +250,7 @@ const ScriptTool = ({ onSubmit, initialValue }: IProps) => {
               <Form.Control asChild>
                 <textarea
                   name="replacementContent"
-                  placeholder="替换的JS内容"
+                  placeholder={t("script.replacementPlaceholder")}
                   defaultValue={editingRule?.replacementContent || ""}
                   onChange={() => message && setMessage("")}
                   className="w-full box-border border border-[#ddd] rounded text-xs p-2 min-h-[100px]"
@@ -270,7 +270,7 @@ const ScriptTool = ({ onSubmit, initialValue }: IProps) => {
                   type="submit"
                   className="flex-1 text-xs p-2 bg-[#233895] text-white border-none rounded cursor-pointer hover:bg-[#1a2b75]"
                 >
-                  {editingRule ? "保存修改" : "添加规则"}
+                  {editingRule ? t("common.saveChanges") : t("common.addRule")}
                 </button>
               </Form.Submit>
               <button
@@ -278,7 +278,7 @@ const ScriptTool = ({ onSubmit, initialValue }: IProps) => {
                 onClick={handleCancelEdit}
                 className="flex-1 text-xs p-2 bg-[#f5f5f5] text-[#666] border border-[#ddd] rounded cursor-pointer hover:bg-[#e8e8e8]"
               >
-                取消
+                {t("common.cancel")}
               </button>
             </div>
           </Form.Root>

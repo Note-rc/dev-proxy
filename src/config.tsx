@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
+import t, { getLocale, saveLocale, loadSavedLocale, Locale } from "./i18n";
 import chromeStore from "./tools/chromeStore";
 import { ProxyRule } from "./components/proxyPopup/RouteReplaceTool";
 import { RedirectRule } from "./components/proxyPopup/RedirectTool";
@@ -163,13 +164,13 @@ const ProxyConfig: React.FC<{ initialValue: ProxyRule[] }> = ({
                 <div className="space-y-1 text-sm">
                   <div>
                     <span className="font-semibold text-gray-700">
-                      源地址：
+                      {t("config.sourceAddr")}：
                     </span>
                     <span className="text-gray-600">{rule.sourcePrefix}</span>
                   </div>
                   <div>
                     <span className="font-semibold text-gray-700">
-                      目标地址：
+                      {t("config.targetAddr")}：
                     </span>
                     <span className="text-gray-600">{rule.targetPrefix}</span>
                   </div>
@@ -180,13 +181,13 @@ const ProxyConfig: React.FC<{ initialValue: ProxyRule[] }> = ({
                   onClick={() => startEdit(rule)}
                   className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
                 >
-                  编辑
+                  {t("common.edit")}
                 </button>
                 <button
                   onClick={() => deleteRule(rule.id)}
                   className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
                 >
-                  删除
+                  {t("common.delete")}
                 </button>
               </div>
             </div>
@@ -199,7 +200,7 @@ const ProxyConfig: React.FC<{ initialValue: ProxyRule[] }> = ({
           onClick={() => setIsAdding(true)}
           className="w-full py-3 border-2 border-dashed border-blue-300 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors font-medium"
         >
-          + 添加新的路由规则
+          {t("config.addRouteRule")}
         </button>
       ) : (
         <form
@@ -207,7 +208,7 @@ const ProxyConfig: React.FC<{ initialValue: ProxyRule[] }> = ({
           className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg space-y-4"
         >
           <h4 className="font-bold text-lg text-gray-800">
-            {editingId ? "编辑规则" : "新增规则"}
+            {editingId ? t("common.editRule") : t("common.newRule")}
           </h4>
 
           <input
@@ -215,7 +216,7 @@ const ProxyConfig: React.FC<{ initialValue: ProxyRule[] }> = ({
             onChange={(e) =>
               setFormData({ ...formData, sourcePrefix: e.target.value })
             }
-            placeholder="源地址前缀（如：https://api.example.com）"
+            placeholder={t("config.sourcePrefixPlaceholder")}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             required
           />
@@ -225,7 +226,7 @@ const ProxyConfig: React.FC<{ initialValue: ProxyRule[] }> = ({
             onChange={(e) =>
               setFormData({ ...formData, targetPrefix: e.target.value })
             }
-            placeholder="目标地址前缀（如：http://localhost:3000）"
+            placeholder={t("config.targetPrefixPlaceholder")}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             required
           />
@@ -235,7 +236,7 @@ const ProxyConfig: React.FC<{ initialValue: ProxyRule[] }> = ({
               type="submit"
               className="flex-1 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
             >
-              保存
+              {t("common.save")}
             </button>
             <button
               type="button"
@@ -246,7 +247,7 @@ const ProxyConfig: React.FC<{ initialValue: ProxyRule[] }> = ({
               }}
               className="flex-1 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium"
             >
-              取消
+              {t("common.cancel")}
             </button>
           </div>
         </form>
@@ -342,13 +343,13 @@ const ScriptConfig: React.FC<{ initialValue: ScriptRule[] }> = ({
                 <div className="space-y-1 text-sm">
                   <div>
                     <span className="font-semibold text-gray-700">
-                      脚本URL：
+                      {t("config.scriptUrl")}：
                     </span>
                     <span className="text-gray-600">{rule.scriptUrl}</span>
                   </div>
                   <div>
                     <span className="font-semibold text-gray-700">
-                      替换内容：
+                      {t("config.replacement")}：
                     </span>
                     <span className="text-gray-600 font-mono text-xs">
                       {rule.replacementContent.substring(0, 80)}
@@ -362,13 +363,13 @@ const ScriptConfig: React.FC<{ initialValue: ScriptRule[] }> = ({
                   onClick={() => startEdit(rule)}
                   className="px-3 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600"
                 >
-                  编辑
+                  {t("common.edit")}
                 </button>
                 <button
                   onClick={() => deleteRule(rule.id)}
                   className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
                 >
-                  删除
+                  {t("common.delete")}
                 </button>
               </div>
             </div>
@@ -381,7 +382,7 @@ const ScriptConfig: React.FC<{ initialValue: ScriptRule[] }> = ({
           onClick={() => setIsAdding(true)}
           className="w-full py-3 border-2 border-dashed border-green-300 text-green-600 rounded-lg hover:bg-green-50 transition-colors font-medium"
         >
-          + 添加脚本替换规则
+          {t("config.addScriptRule")}
         </button>
       ) : (
         <form
@@ -389,7 +390,7 @@ const ScriptConfig: React.FC<{ initialValue: ScriptRule[] }> = ({
           className="p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg space-y-4"
         >
           <h4 className="font-bold text-lg text-gray-800">
-            {editingId ? "编辑规则" : "新增规则"}
+            {editingId ? t("common.editRule") : t("common.newRule")}
           </h4>
 
           <input
@@ -397,7 +398,7 @@ const ScriptConfig: React.FC<{ initialValue: ScriptRule[] }> = ({
             onChange={(e) =>
               setFormData({ ...formData, scriptUrl: e.target.value })
             }
-            placeholder="需要替换的脚本URL（如：https://example.com/script.js）"
+            placeholder={t("config.scriptUrlInputPlaceholder")}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
             required
           />
@@ -407,7 +408,7 @@ const ScriptConfig: React.FC<{ initialValue: ScriptRule[] }> = ({
             onChange={(e) =>
               setFormData({ ...formData, replacementContent: e.target.value })
             }
-            placeholder="替换的JavaScript代码内容"
+            placeholder={t("config.replacementCodePlaceholder")}
             rows={10}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent font-mono text-sm"
             required
@@ -418,7 +419,7 @@ const ScriptConfig: React.FC<{ initialValue: ScriptRule[] }> = ({
               type="submit"
               className="flex-1 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
             >
-              保存
+              {t("common.save")}
             </button>
             <button
               type="button"
@@ -429,7 +430,7 @@ const ScriptConfig: React.FC<{ initialValue: ScriptRule[] }> = ({
               }}
               className="flex-1 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium"
             >
-              取消
+              {t("common.cancel")}
             </button>
           </div>
         </form>
@@ -498,12 +499,14 @@ const RedirectConfig: React.FC<{ initialValue: RedirectRule[] }> = ({
                 </div>
                 <div className="space-y-1 text-sm">
                   <div>
-                    <span className="font-semibold text-gray-700">源JS：</span>
+                    <span className="font-semibold text-gray-700">
+                      {t("config.sourceJs")}：
+                    </span>
                     <span className="text-gray-600">{rule.codeUrl}</span>
                   </div>
                   <div>
                     <span className="font-semibold text-gray-700">
-                      重定向至：
+                      {t("config.redirectTo")}：
                     </span>
                     <span className="text-gray-600">{rule.redirectUrl}</span>
                   </div>
@@ -513,7 +516,7 @@ const RedirectConfig: React.FC<{ initialValue: RedirectRule[] }> = ({
                 onClick={() => deleteRule(rule.id)}
                 className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
               >
-                删除
+                {t("common.delete")}
               </button>
             </div>
           </div>
@@ -525,21 +528,23 @@ const RedirectConfig: React.FC<{ initialValue: RedirectRule[] }> = ({
           onClick={() => setIsAdding(true)}
           className="w-full py-3 border-2 border-dashed border-purple-300 text-purple-600 rounded-lg hover:bg-purple-50 transition-colors font-medium"
         >
-          + 添加JS重定向规则
+          {t("config.addRedirectRule")}
         </button>
       ) : (
         <form
           onSubmit={handleSubmit}
           className="p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg space-y-4"
         >
-          <h4 className="font-bold text-lg text-gray-800">新增重定向规则</h4>
+          <h4 className="font-bold text-lg text-gray-800">
+            {t("config.newRedirectRule")}
+          </h4>
 
           <input
             value={formData.codeUrl}
             onChange={(e) =>
               setFormData({ ...formData, codeUrl: e.target.value })
             }
-            placeholder="需要重定向的JS URL"
+            placeholder={t("config.redirectSourcePlaceholder")}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             required
           />
@@ -549,7 +554,7 @@ const RedirectConfig: React.FC<{ initialValue: RedirectRule[] }> = ({
             onChange={(e) =>
               setFormData({ ...formData, redirectUrl: e.target.value })
             }
-            placeholder="重定向到的URL"
+            placeholder={t("config.redirectTargetPlaceholder")}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             required
           />
@@ -559,7 +564,7 @@ const RedirectConfig: React.FC<{ initialValue: RedirectRule[] }> = ({
               type="submit"
               className="flex-1 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium"
             >
-              保存
+              {t("common.save")}
             </button>
             <button
               type="button"
@@ -569,7 +574,7 @@ const RedirectConfig: React.FC<{ initialValue: RedirectRule[] }> = ({
               }}
               className="flex-1 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium"
             >
-              取消
+              {t("common.cancel")}
             </button>
           </div>
         </form>
@@ -670,7 +675,7 @@ const HeaderConfigPanel: React.FC<{ initialValue: HeaderRule[] }> = ({
                   {rule.urlPattern && (
                     <div>
                       <span className="font-semibold text-gray-700">
-                        URL匹配：
+                        {t("config.urlMatch")}：
                       </span>
                       <span className="text-gray-600">{rule.urlPattern}</span>
                     </div>
@@ -682,13 +687,13 @@ const HeaderConfigPanel: React.FC<{ initialValue: HeaderRule[] }> = ({
                   onClick={() => startEdit(rule)}
                   className="px-3 py-1 text-sm bg-orange-500 text-white rounded hover:bg-orange-600"
                 >
-                  编辑
+                  {t("common.edit")}
                 </button>
                 <button
                   onClick={() => deleteRule(rule.id)}
                   className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
                 >
-                  删除
+                  {t("common.delete")}
                 </button>
               </div>
             </div>
@@ -701,7 +706,7 @@ const HeaderConfigPanel: React.FC<{ initialValue: HeaderRule[] }> = ({
           onClick={() => setIsAdding(true)}
           className="w-full py-3 border-2 border-dashed border-orange-300 text-orange-600 rounded-lg hover:bg-orange-50 transition-colors font-medium"
         >
-          + 添加请求头规则
+          {t("config.addHeaderRule")}
         </button>
       ) : (
         <form
@@ -709,7 +714,7 @@ const HeaderConfigPanel: React.FC<{ initialValue: HeaderRule[] }> = ({
           className="p-6 bg-gradient-to-br from-orange-50 to-amber-50 rounded-lg space-y-4"
         >
           <h4 className="font-bold text-lg text-gray-800">
-            {editingId ? "编辑规则" : "新增规则"}
+            {editingId ? t("common.editRule") : t("common.newRule")}
           </h4>
 
           <input
@@ -717,7 +722,7 @@ const HeaderConfigPanel: React.FC<{ initialValue: HeaderRule[] }> = ({
             onChange={(e) =>
               setFormData({ ...formData, headerName: e.target.value })
             }
-            placeholder="Header 名称（如：X-Custom-Token）"
+            placeholder={t("config.headerNamePlaceholder")}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
             required
           />
@@ -727,7 +732,7 @@ const HeaderConfigPanel: React.FC<{ initialValue: HeaderRule[] }> = ({
             onChange={(e) =>
               setFormData({ ...formData, headerValue: e.target.value })
             }
-            placeholder="Header 值"
+            placeholder={t("config.headerValuePlaceholder")}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
             required
           />
@@ -737,7 +742,7 @@ const HeaderConfigPanel: React.FC<{ initialValue: HeaderRule[] }> = ({
             onChange={(e) =>
               setFormData({ ...formData, urlPattern: e.target.value })
             }
-            placeholder="URL 匹配（留空则匹配所有请求）"
+            placeholder={t("config.urlPatternPlaceholder")}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
           />
 
@@ -746,7 +751,7 @@ const HeaderConfigPanel: React.FC<{ initialValue: HeaderRule[] }> = ({
               type="submit"
               className="flex-1 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-medium"
             >
-              保存
+              {t("common.save")}
             </button>
             <button
               type="button"
@@ -761,7 +766,7 @@ const HeaderConfigPanel: React.FC<{ initialValue: HeaderRule[] }> = ({
               }}
               className="flex-1 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium"
             >
-              取消
+              {t("common.cancel")}
             </button>
           </div>
         </form>
@@ -785,11 +790,11 @@ const ProxyServerConfig: React.FC<{ initialValue: ProxyConfig | null }> = ({
   const getModeLabel = (mode: ProxyMode): string => {
     switch (mode) {
       case ProxyMode.SYSTEM:
-        return "系统代理";
+        return t("proxy.system");
       case ProxyMode.DIRECT:
-        return "直接连接";
+        return t("proxy.direct");
       case ProxyMode.CUSTOM:
-        return "自定义模式";
+        return t("proxy.custom");
       default:
         return "";
     }
@@ -799,14 +804,14 @@ const ProxyServerConfig: React.FC<{ initialValue: ProxyConfig | null }> = ({
     const newConfig = { ...config, mode };
     await chromeStore.set("proxyServerConfig", newConfig);
     setConfig(newConfig);
-    setMessage("✅ 代理模式已更新");
+    setMessage(t("proxy.modeUpdated"));
     setTimeout(() => setMessage(""), 3000);
   };
 
   const handleServerSave = async (e: React.FormEvent) => {
     e.preventDefault();
     await chromeStore.set("proxyServerConfig", config);
-    setMessage("✅ 代理服务器配置已保存");
+    setMessage("✅ " + t("proxy.serverSaved"));
     setTimeout(() => setMessage(""), 3000);
   };
 
@@ -814,7 +819,9 @@ const ProxyServerConfig: React.FC<{ initialValue: ProxyConfig | null }> = ({
     <div className="space-y-6">
       {/* 模式选择 */}
       <div>
-        <h4 className="font-semibold mb-3 text-gray-700">代理模式</h4>
+        <h4 className="font-semibold mb-3 text-gray-700">
+          {t("config.proxyMode")}
+        </h4>
         <div className="grid grid-cols-3 gap-3">
           {Object.values(ProxyMode).map((mode) => (
             <button
@@ -839,10 +846,12 @@ const ProxyServerConfig: React.FC<{ initialValue: ProxyConfig | null }> = ({
             onSubmit={handleServerSave}
             className="space-y-4 p-4 bg-indigo-50 rounded-lg"
           >
-            <h4 className="font-semibold text-gray-700">代理服务器设置</h4>
+            <h4 className="font-semibold text-gray-700">
+              {t("config.proxyServerSettings")}
+            </h4>
 
             <div className="text-sm text-gray-600 p-3 bg-yellow-50 border border-yellow-200 rounded">
-              💡 建议配合{" "}
+              💡 {t("config.whistleTip")}{" "}
               <a
                 href="https://github.com/avwo/whistle"
                 target="_blank"
@@ -851,12 +860,12 @@ const ProxyServerConfig: React.FC<{ initialValue: ProxyConfig | null }> = ({
               >
                 whistle
               </a>{" "}
-              一起使用，whistle 是一个功能强大的跨平台网络调试工具
+              {t("config.whistleDesc")}
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-2 text-gray-700">
-                服务器地址
+                {t("config.serverAddr")}
               </label>
               <input
                 type="text"
@@ -870,14 +879,14 @@ const ProxyServerConfig: React.FC<{ initialValue: ProxyConfig | null }> = ({
                     },
                   })
                 }
-                placeholder="例如: 127.0.0.1"
+                placeholder={t("config.serverAddrPlaceholder")}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-2 text-gray-700">
-                端口号
+                {t("config.port")}
               </label>
               <input
                 type="number"
@@ -891,7 +900,7 @@ const ProxyServerConfig: React.FC<{ initialValue: ProxyConfig | null }> = ({
                     },
                   })
                 }
-                placeholder="例如: 8080"
+                placeholder={t("config.portPlaceholder")}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
               />
             </div>
@@ -900,7 +909,7 @@ const ProxyServerConfig: React.FC<{ initialValue: ProxyConfig | null }> = ({
               type="submit"
               className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium"
             >
-              保存服务器配置
+              {t("config.saveServerConfig")}
             </button>
           </form>
         </>
@@ -922,9 +931,24 @@ const ConfigPage: React.FC = () => {
   const [scriptConfig, setScriptConfig] = useState<ScriptRule[]>([]);
   const [redirectConfig, setRedirectConfig] = useState<RedirectRule[]>([]);
   const [headerConfigData, setHeaderConfigData] = useState<HeaderRule[]>([]);
+  const [locale, setLocaleState] = useState<Locale>(getLocale());
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    // 加载代理服务器配置
+    loadSavedLocale().then((saved) => {
+      setLocaleState(saved);
+      setReady(true);
+    });
+  }, []);
+
+  const handleLocaleToggle = async () => {
+    const next: Locale = locale === "en" ? "zh" : "en";
+    await saveLocale(next);
+    setLocaleState(next);
+  };
+
+  useEffect(() => {
+    if (!ready) return;
     chromeStore.get("proxyServerConfig").then((data) => {
       if (data) {
         setProxyServerConfig(data);
@@ -968,74 +992,87 @@ const ConfigPage: React.FC = () => {
         setHeaderConfigData(data);
       }
     });
-  }, []);
+  }, [ready]);
+
+  if (!ready) return null;
 
   const configs = [
     {
       id: "header",
-      title: "Header Modify",
+      title: t("config.headerModifyTitle"),
       icon: "📋",
       color: "#f97316",
-      description: "为请求添加或修改自定义Header",
+      description: t("config.headerDesc"),
       component: <HeaderConfigPanel initialValue={headerConfigData} />,
     },
     {
       id: "proxy",
-      title: "Route Replace",
+      title: t("config.routeReplaceTitle"),
       icon: "🌐",
       color: "#3b82f6",
-      description: "将特定URL请求代理到目标地址",
+      description: t("config.routeDesc"),
       component: <ProxyConfig initialValue={proxyConfig} />,
     },
     {
       id: "script",
-      title: "Script Replace",
+      title: t("config.scriptReplaceTitle"),
       icon: "📝",
       color: "#10b981",
-      description: "替换页面中的JavaScript文件内容",
+      description: t("config.scriptDesc"),
       component: <ScriptConfig initialValue={scriptConfig} />,
     },
     {
       id: "redirect",
-      title: "JS Redirect",
+      title: t("config.jsRedirectTitle"),
       icon: "🔀",
       color: "#8b5cf6",
-      description: "将JS文件请求重定向到其他地址",
+      description: t("config.redirectDesc"),
       component: <RedirectConfig initialValue={redirectConfig} />,
     },
     {
       id: "proxyServer",
-      title: "Proxy Server",
+      title: t("config.proxyServerTitle"),
       icon: "🚀",
       color: "#6366f1",
-      description: "配置代理模式和代理服务器设置",
+      description: t("config.proxyServerDesc"),
       component: <ProxyServerConfig initialValue={proxyServerConfig} />,
     },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div key={locale} className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* 顶部导航栏 */}
       <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                Dev Proxy 配置中心（由AI生成）
+                {t("config.title")}
               </h1>
-              <p className="text-gray-500 mt-1">管理你的开发代理工具配置</p>
+              <p className="text-gray-500 mt-1">{t("config.subtitle")}</p>
             </div>
-            <button
-              onClick={() => {
-                window.open(
-                  `chrome-extension://${chrome.runtime.id}/help.html`,
-                  "_blank",
-                );
-              }}
-              className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg font-medium"
-            >
-              📖 帮助文档
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleLocaleToggle}
+                className="px-4 py-3 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-all shadow-sm hover:shadow-md font-medium flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {locale === "en" ? "中文" : "English"}
+              </button>
+              <button
+                onClick={() => {
+                  window.open(
+                    `chrome-extension://${chrome.runtime.id}/help.html`,
+                    "_blank",
+                  );
+                }}
+                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg font-medium"
+              >
+                {t("config.helpDoc")}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -1076,7 +1113,7 @@ const ConfigPage: React.FC = () => {
                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            所有配置会自动保存，刷新页面即可生效
+            {t("config.autoSaveHint")}
           </div>
         </div>
       </div>

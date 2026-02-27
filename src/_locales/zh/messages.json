@@ -1,0 +1,10 @@
+{
+  "appName": {
+    "message": "Dev Proxy",
+    "description": "扩展名称"
+  },
+  "appDescription": {
+    "message": "一个功能强大的 Chrome 开发者代理工具，提供请求头修改、路由替换、脚本替换、JS 重定向和代理服务器配置等功能。",
+    "description": "扩展描述"
+  }
+}

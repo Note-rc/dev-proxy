@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Form, Toast } from "radix-ui";
 import { CheckIcon } from "@radix-ui/react-icons";
+import t from "../../i18n";
 
 // 代理模式枚举
 export enum ProxyMode {
@@ -90,12 +91,12 @@ const ProxyTool = ({ onSubmit, initialValue }: IProps) => {
     e.preventDefault();
 
     if (!serverForm.host) {
-      setMessage("请输入代理服务器地址");
+      setMessage(t("proxy.hostRequired"));
       return;
     }
 
     if (!serverForm.port || serverForm.port < 1 || serverForm.port > 65535) {
-      setMessage("请输入有效的端口号 (1-65535)");
+      setMessage(t("proxy.portInvalid"));
       return;
     }
 
@@ -108,9 +109,9 @@ const ProxyTool = ({ onSubmit, initialValue }: IProps) => {
       await onSubmit(newConfig);
       setConfig(newConfig);
       setMessage("");
-      showToast("success", "代理服务器配置已保存");
+      showToast("success", t("proxy.serverSaved"));
     } catch (error) {
-      showToast("error", "保存失败");
+      showToast("error", t("common.saveFailed"));
     }
   };
 
@@ -118,11 +119,11 @@ const ProxyTool = ({ onSubmit, initialValue }: IProps) => {
   const getModeLabel = (mode: ProxyMode): string => {
     switch (mode) {
       case ProxyMode.SYSTEM:
-        return "系统代理";
+        return t("proxy.system");
       case ProxyMode.DIRECT:
-        return "直接连接";
+        return t("proxy.direct");
       case ProxyMode.CUSTOM:
-        return "自定义模式";
+        return t("proxy.custom");
       default:
         return "";
     }
@@ -133,7 +134,7 @@ const ProxyTool = ({ onSubmit, initialValue }: IProps) => {
       <div className="w-full">
         {/* 代理模式选择 */}
         <div className="mb-4">
-          <div className="text-xs font-medium mb-2 text-[#666]">代理模式</div>
+          <div className="text-xs font-medium mb-2 text-[#666]">{t("proxy.mode")}</div>
           <div className="flex flex-col gap-2">
             {Object.values(ProxyMode).map((mode) => (
               <button
@@ -152,9 +153,9 @@ const ProxyTool = ({ onSubmit, initialValue }: IProps) => {
                   {config.mode === mode && <CheckIcon className="w-4 h-4" />}
                 </div>
                 <div className="text-xs mt-1 opacity-80">
-                  {mode === ProxyMode.SYSTEM && "使用系统配置的代理设置"}
-                  {mode === ProxyMode.DIRECT && "不使用代理，直接连接"}
-                  {mode === ProxyMode.CUSTOM && "使用自定义代理服务器（建议配合 whistle 使用）"}
+                  {mode === ProxyMode.SYSTEM && t("proxy.systemDesc")}
+                  {mode === ProxyMode.DIRECT && t("proxy.directDesc")}
+                  {mode === ProxyMode.CUSTOM && t("proxy.customDesc")}
                 </div>
               </button>
             ))}
@@ -165,10 +166,10 @@ const ProxyTool = ({ onSubmit, initialValue }: IProps) => {
         {config.mode === ProxyMode.CUSTOM && (
           <div className="p-3 bg-[#f5f5f5] rounded">
             <div className="text-xs font-medium mb-2 text-[#666]">
-              代理服务器配置
+              {t("proxy.serverConfig")}
             </div>
             <div className="text-xs text-[#888] mb-2 p-2 bg-[#fff9e6] border border-[#ffe7a0] rounded">
-              💡 建议配合 <a href="https://github.com/avwo/whistle" target="_blank" rel="noopener noreferrer" className="text-[#233895] underline">whistle</a> 一起使用
+              💡 {t("proxy.whistleTip")} <a href="https://github.com/avwo/whistle" target="_blank" rel="noopener noreferrer" className="text-[#233895] underline">whistle</a>
             </div>
             <Form.Root onSubmit={handleServerSubmit}>
               <div className="space-y-2">
@@ -180,7 +181,7 @@ const ProxyTool = ({ onSubmit, initialValue }: IProps) => {
                       setServerForm({ ...serverForm, host: e.target.value });
                       message && setMessage("");
                     }}
-                    placeholder="代理服务器地址 (例如: 127.0.0.1)"
+                    placeholder={t("proxy.serverPlaceholder")}
                     className="w-full border border-[#ddd] rounded text-xs p-2"
                   />
                 </Form.Field>
@@ -196,7 +197,7 @@ const ProxyTool = ({ onSubmit, initialValue }: IProps) => {
                       });
                       message && setMessage("");
                     }}
-                    placeholder="端口号"
+                    placeholder={t("proxy.portPlaceholder")}
                     className="w-full border border-[#ddd] rounded text-xs p-2"
                   />
                 </Form.Field>
@@ -209,7 +210,7 @@ const ProxyTool = ({ onSubmit, initialValue }: IProps) => {
                   type="submit"
                   className="w-full text-xs p-2 bg-[#233895] text-white rounded hover:bg-[#1a2b75] transition-colors"
                 >
-                  保存服务器配置
+                  {t("proxy.saveServerConfig")}
                 </button>
               </div>
             </Form.Root>

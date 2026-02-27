@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Form, Checkbox, Toast } from "radix-ui";
 import { CheckIcon, TrashIcon, Pencil1Icon, PlusIcon } from "@radix-ui/react-icons";
+import t from "../../i18n";
 
 export interface HeaderRule {
   id: string;
@@ -47,12 +48,12 @@ const HeaderTool = ({ onSubmit, initialValue }: IProps) => {
     const urlPattern = (formData.get("urlPattern") as string)?.trim();
 
     if (!headerName) {
-      setMessage("请填写 Header 名称");
+      setMessage(t("header.nameRequired"));
       return;
     }
 
     if (!headerValue) {
-      setMessage("请填写 Header 值");
+      setMessage(t("header.valueRequired"));
       return;
     }
 
@@ -81,9 +82,9 @@ const HeaderTool = ({ onSubmit, initialValue }: IProps) => {
       setEditingRule(null);
       setIsAdding(false);
       setMessage("");
-      showToast("success", "保存成功");
+      showToast("success", t("common.saveSuccess"));
     } catch (error) {
-      showToast("error", "保存失败");
+      showToast("error", t("common.saveFailed"));
     }
   };
 
@@ -95,9 +96,9 @@ const HeaderTool = ({ onSubmit, initialValue }: IProps) => {
     try {
       await onSubmit(newRules);
       setRules(newRules);
-      showToast("success", "状态已更新");
+      showToast("success", t("common.statusUpdated"));
     } catch (error) {
-      showToast("error", "更新失败");
+      showToast("error", t("common.updateFailed"));
     }
   };
 
@@ -107,9 +108,9 @@ const HeaderTool = ({ onSubmit, initialValue }: IProps) => {
     try {
       await onSubmit(newRules);
       setRules(newRules);
-      showToast("success", "删除成功");
+      showToast("success", t("common.deleteSuccess"));
     } catch (error) {
-      showToast("error", "删除失败");
+      showToast("error", t("common.deleteFailed"));
     }
   };
 
@@ -130,12 +131,12 @@ const HeaderTool = ({ onSubmit, initialValue }: IProps) => {
       <div className="w-full">
         <div className="mb-3">
           <div className="text-xs font-medium mb-2 text-[#666]">
-            已配置的请求头规则 ({rules.length})
+            {t("header.configuredRules")} ({rules.length})
           </div>
           <div className="max-h-[300px] overflow-y-auto">
             {rules.length === 0 ? (
               <div className="text-xs text-[#999] text-center py-4 border border-dashed border-[#ddd] rounded">
-                暂无规则，点击下方按钮添加
+                {t("common.noRulesHint")}
               </div>
             ) : (
               rules.map((rule) => (
@@ -161,7 +162,7 @@ const HeaderTool = ({ onSubmit, initialValue }: IProps) => {
                         </div>
                         {rule.urlPattern && (
                           <div className="text-xs text-[#999] break-all mt-1">
-                            <span className="font-medium">匹配:</span> {rule.urlPattern}
+                            <span className="font-medium">{t("common.match")}:</span> {rule.urlPattern}
                           </div>
                         )}
                       </div>
@@ -170,14 +171,14 @@ const HeaderTool = ({ onSubmit, initialValue }: IProps) => {
                       <button
                         onClick={() => handleEdit(rule)}
                         className="p-1 text-[#233895] hover:bg-[#f0f0f0] rounded cursor-pointer"
-                        title="编辑"
+                        title={t("common.edit")}
                       >
                         <Pencil1Icon />
                       </button>
                       <button
                         onClick={() => handleDelete(rule.id)}
                         className="p-1 text-[#ff4d4f] hover:bg-[#fff2f0] rounded cursor-pointer"
-                        title="删除"
+                        title={t("common.delete")}
                       >
                         <TrashIcon />
                       </button>
@@ -195,19 +196,19 @@ const HeaderTool = ({ onSubmit, initialValue }: IProps) => {
             className="w-full flex items-center justify-center gap-1 text-xs p-2 bg-[#233895] text-white border-none rounded cursor-pointer hover:bg-[#1a2b75]"
           >
             <PlusIcon />
-            添加新规则
+            {t("common.addNewRule")}
           </button>
         ) : (
           <Form.Root className="w-full" onSubmit={handleSubmitForm}>
             <div className="text-xs font-medium mb-2 text-[#666]">
-              {editingRule ? "编辑规则" : "添加新规则"}
+              {editingRule ? t("common.editRule") : t("common.addNewRule")}
             </div>
 
             <Form.Field className="my-2 w-full" name="headerName">
               <Form.Control asChild>
                 <input
                   name="headerName"
-                  placeholder="Header 名称（如：X-Custom-Token）"
+                  placeholder={t("header.namePlaceholder")}
                   defaultValue={editingRule?.headerName || ""}
                   onChange={() => message && setMessage("")}
                   className="w-full box-border border border-[#ddd] rounded text-xs p-2"
@@ -219,7 +220,7 @@ const HeaderTool = ({ onSubmit, initialValue }: IProps) => {
               <Form.Control asChild>
                 <input
                   name="headerValue"
-                  placeholder="Header 值"
+                  placeholder={t("header.valuePlaceholder")}
                   defaultValue={editingRule?.headerValue || ""}
                   onChange={() => message && setMessage("")}
                   className="w-full box-border border border-[#ddd] rounded text-xs p-2"
@@ -231,7 +232,7 @@ const HeaderTool = ({ onSubmit, initialValue }: IProps) => {
               <Form.Control asChild>
                 <input
                   name="urlPattern"
-                  placeholder="URL 匹配（留空则匹配所有请求）"
+                  placeholder={t("header.urlPatternPlaceholder")}
                   defaultValue={editingRule?.urlPattern || ""}
                   className="w-full box-border border border-[#ddd] rounded text-xs p-2"
                 />
@@ -248,7 +249,7 @@ const HeaderTool = ({ onSubmit, initialValue }: IProps) => {
                   type="submit"
                   className="flex-1 text-xs p-2 bg-[#233895] text-white border-none rounded cursor-pointer hover:bg-[#1a2b75]"
                 >
-                  {editingRule ? "保存修改" : "添加规则"}
+                  {editingRule ? t("common.saveChanges") : t("common.addRule")}
                 </button>
               </Form.Submit>
               <button
@@ -256,7 +257,7 @@ const HeaderTool = ({ onSubmit, initialValue }: IProps) => {
                 onClick={handleCancelEdit}
                 className="flex-1 text-xs p-2 bg-[#f5f5f5] text-[#666] border border-[#ddd] rounded cursor-pointer hover:bg-[#e8e8e8]"
               >
-                取消
+                {t("common.cancel")}
               </button>
             </div>
           </Form.Root>

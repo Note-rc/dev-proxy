@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Form, Checkbox, Toast } from "radix-ui";
 import { CheckIcon, TrashIcon, Pencil1Icon, PlusIcon } from "@radix-ui/react-icons";
+import t from "../../i18n";
 
 export interface RedirectRule {
   id: string;
@@ -38,12 +39,12 @@ const RedirectTool = ({ onSubmit, initialValue }: IProps) => {
     const redirectUrl = (formData.get("redirectUrl") as string)?.trim();
 
     if (!codeUrl) {
-      setMessage("请填写需要重定向的js URL");
+      setMessage(t("redirect.codeUrlRequired"));
       return;
     }
 
     if (!redirectUrl) {
-      setMessage("请填写重定向到的URL地址");
+      setMessage(t("redirect.redirectUrlRequired"));
       return;
     }
 
@@ -76,12 +77,11 @@ const RedirectTool = ({ onSubmit, initialValue }: IProps) => {
 
       // 显示成功提示
       setToastType("success");
-      setToastMessage("保存成功");
+      setToastMessage(t("common.saveSuccess"));
       setOpen(true);
     } catch (error) {
-      // 显示错误提示
       setToastType("error");
-      setToastMessage("保存失败");
+      setToastMessage(t("common.saveFailed"));
       setOpen(true);
     }
 
@@ -101,12 +101,12 @@ const RedirectTool = ({ onSubmit, initialValue }: IProps) => {
       setRules(newRules);
       
       setToastType("success");
-      setToastMessage("状态已更新");
+      setToastMessage(t("common.statusUpdated"));
       setOpen(true);
       setTimeout(() => setOpen(false), 3000);
     } catch (error) {
       setToastType("error");
-      setToastMessage("更新失败");
+      setToastMessage(t("common.updateFailed"));
       setOpen(true);
       setTimeout(() => setOpen(false), 3000);
     }
@@ -120,12 +120,12 @@ const RedirectTool = ({ onSubmit, initialValue }: IProps) => {
       setRules(newRules);
       
       setToastType("success");
-      setToastMessage("删除成功");
+      setToastMessage(t("common.deleteSuccess"));
       setOpen(true);
       setTimeout(() => setOpen(false), 3000);
     } catch (error) {
       setToastType("error");
-      setToastMessage("删除失败");
+      setToastMessage(t("common.deleteFailed"));
       setOpen(true);
       setTimeout(() => setOpen(false), 3000);
     }
@@ -149,12 +149,12 @@ const RedirectTool = ({ onSubmit, initialValue }: IProps) => {
         {/* 规则列表 */}
         <div className="mb-3">
           <div className="text-xs font-medium mb-2 text-[#666]">
-            已配置的重定向规则 ({rules.length})
+            {t("redirect.configuredRules")} ({rules.length})
           </div>
           <div className="max-h-[300px] overflow-y-auto">
             {rules.length === 0 ? (
               <div className="text-xs text-[#999] text-center py-4 border border-dashed border-[#ddd] rounded">
-                暂无规则，点击下方按钮添加
+                {t("common.noRulesHint")}
               </div>
             ) : (
               rules.map((rule) => (
@@ -175,10 +175,10 @@ const RedirectTool = ({ onSubmit, initialValue }: IProps) => {
                       </Checkbox.Root>
                       <div className="flex-1 min-w-0">
                         <div className="text-xs text-[#333] break-all">
-                          <span className="font-medium">源:</span> {rule.codeUrl}
+                          <span className="font-medium">{t("common.source")}:</span> {rule.codeUrl}
                         </div>
                         <div className="text-xs text-[#666] break-all mt-1">
-                          <span className="font-medium">目标:</span> {rule.redirectUrl}
+                          <span className="font-medium">{t("common.target")}:</span> {rule.redirectUrl}
                         </div>
                       </div>
                     </div>
@@ -186,14 +186,14 @@ const RedirectTool = ({ onSubmit, initialValue }: IProps) => {
                       <button
                         onClick={() => handleEdit(rule)}
                         className="p-1 text-[#233895] hover:bg-[#f0f0f0] rounded cursor-pointer"
-                        title="编辑"
+                        title={t("common.edit")}
                       >
                         <Pencil1Icon />
                       </button>
                       <button
                         onClick={() => handleDelete(rule.id)}
                         className="p-1 text-[#ff4d4f] hover:bg-[#fff2f0] rounded cursor-pointer"
-                        title="删除"
+                        title={t("common.delete")}
                       >
                         <TrashIcon />
                       </button>
@@ -212,19 +212,19 @@ const RedirectTool = ({ onSubmit, initialValue }: IProps) => {
             className="w-full flex items-center justify-center gap-1 text-xs p-2 bg-[#233895] text-white border-none rounded cursor-pointer hover:bg-[#1a2b75]"
           >
             <PlusIcon />
-            添加新规则
+            {t("common.addNewRule")}
           </button>
         ) : (
           <Form.Root className="w-full" onSubmit={handleSubmitForm}>
             <div className="text-xs font-medium mb-2 text-[#666]">
-              {editingRule ? "编辑规则" : "添加新规则"}
+              {editingRule ? t("common.editRule") : t("common.addNewRule")}
             </div>
 
             <Form.Field className="my-2 w-full" name="codeUrl">
               <Form.Control asChild>
                 <input
                   name="codeUrl"
-                  placeholder="需要重定向的js URL"
+                  placeholder={t("redirect.codeUrlPlaceholder")}
                   defaultValue={editingRule?.codeUrl || ""}
                   onChange={() => message && setMessage("")}
                   className="w-full box-border border border-[#ddd] rounded text-xs p-2"
@@ -236,7 +236,7 @@ const RedirectTool = ({ onSubmit, initialValue }: IProps) => {
               <Form.Control asChild>
                 <input
                   name="redirectUrl"
-                  placeholder="重定向到的URL地址"
+                  placeholder={t("redirect.redirectUrlPlaceholder")}
                   defaultValue={editingRule?.redirectUrl || ""}
                   onChange={() => message && setMessage("")}
                   className="w-full box-border border border-[#ddd] rounded text-xs p-2"
@@ -254,7 +254,7 @@ const RedirectTool = ({ onSubmit, initialValue }: IProps) => {
                   type="submit"
                   className="flex-1 text-xs p-2 bg-[#233895] text-white border-none rounded cursor-pointer hover:bg-[#1a2b75]"
                 >
-                  {editingRule ? "保存修改" : "添加规则"}
+                  {editingRule ? t("common.saveChanges") : t("common.addRule")}
                 </button>
               </Form.Submit>
               <button
@@ -262,7 +262,7 @@ const RedirectTool = ({ onSubmit, initialValue }: IProps) => {
                 onClick={handleCancelEdit}
                 className="flex-1 text-xs p-2 bg-[#f5f5f5] text-[#666] border border-[#ddd] rounded cursor-pointer hover:bg-[#e8e8e8]"
               >
-                取消
+                {t("common.cancel")}
               </button>
             </div>
           </Form.Root>

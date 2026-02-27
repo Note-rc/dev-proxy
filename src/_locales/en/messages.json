@@ -1,0 +1,10 @@
+{
+  "appName": {
+    "message": "Dev Proxy",
+    "description": "Extension name"
+  },
+  "appDescription": {
+    "message": "A powerful developer proxy tool for Chrome, featuring header modification, route replacement, script replacement, JS redirect, and proxy server configuration.",
+    "description": "Extension description"
+  }
+}
