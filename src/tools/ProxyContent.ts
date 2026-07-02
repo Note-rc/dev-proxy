@@ -101,6 +101,8 @@ const replaceIframeSrc = (proxyRules: ProxyRule[]) => {
 };
 
 const ProxyContent = () => {
+  if (!(chrome.runtime && chrome.runtime.id)) return;
+
   let currentObserverCleanup: (() => void) | null = null;
 
   // 处理配置变化
@@ -133,10 +135,14 @@ const ProxyContent = () => {
 
   // 在 DOM 加载完成后初始化
   const initializeProxy = () => {
-    chromeStore.get("proxyConfig").then((config) => {
-      console.log("🚀 ~ proxy extension  ~ initialize :", config);
-      handleConfigChange(config);
-    });
+    try {
+      chromeStore.get("proxyConfig").then((config) => {
+        console.log("🚀 ~ proxy extension  ~ initialize :", config);
+        handleConfigChange(config);
+      });
+    } catch {
+      // Extension context invalidated
+    }
   };
 
   // 监听 DOM 加载完成
@@ -146,11 +152,15 @@ const ProxyContent = () => {
     initializeProxy();
   }
 
-  chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === "local" && changes.proxyConfig) {
-      handleConfigChange(changes.proxyConfig.newValue);
-    }
-  });
+  try {
+    chrome.storage.onChanged.addListener((changes, area) => {
+      if (area === "local" && changes.proxyConfig) {
+        handleConfigChange(changes.proxyConfig.newValue);
+      }
+    });
+  } catch {
+    // Extension context invalidated
+  }
 };
 
 export default ProxyContent;

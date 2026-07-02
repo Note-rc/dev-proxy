@@ -6,12 +6,22 @@ import ProxyContent from "./tools/ProxyContent";
 // 启动iFrame代理功能
 ProxyContent();
 
+function isContextValid() {
+  return !!(chrome.runtime && chrome.runtime.id);
+}
+
 // 报告当前页面的URL
 function reportPageUrl() {
-  chrome.runtime.sendMessage({
-    action: "reportPageUrl",
-    url: window.location.href,
-  });
+  if (!isContextValid()) return;
+  try {
+    chrome.runtime.sendMessage({
+      action: "reportPageUrl",
+      url: window.location.href,
+    });
+  } catch {
+    // Extension context invalidated, stop polling
+    clearInterval(urlCheckInterval);
+  }
 }
 
 // 初始报告
@@ -21,7 +31,11 @@ reportPageUrl();
 let lastUrl = window.location.href;
 
 // 定期检查URL变化
-setInterval(() => {
+const urlCheckInterval = setInterval(() => {
+  if (!isContextValid()) {
+    clearInterval(urlCheckInterval);
+    return;
+  }
   const currentUrl = window.location.href;
   if (currentUrl !== lastUrl) {
     lastUrl = currentUrl;
