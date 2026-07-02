@@ -66,38 +66,33 @@ const Popup = () => {
   };
 
   const saveProfiles = useCallback(
-    async (newProfiles: Profile[]) => {
+    async (newProfiles: Profile[], newActiveId?: string) => {
       setProfiles(newProfiles);
-      await chromeStore.set("profiles", newProfiles);
-      syncToLegacyKeys(newProfiles);
+      if (newActiveId) {
+        setActiveProfileId(newActiveId);
+      }
+
+      const enabledProfile = newProfiles.find((p) => p.enabled);
+      const legacyData: Record<string, any> = {
+        profiles: newProfiles,
+        headerConfig: enabledProfile?.headerConfig || [],
+        scriptConfig: enabledProfile?.scriptConfig || [],
+        codeConfig: enabledProfile?.codeConfig || [],
+      };
+      if (newActiveId) {
+        legacyData.activeProfileId = newActiveId;
+      }
+      if (enabledProfile?.proxyServerConfig) {
+        legacyData.proxyServerConfig = enabledProfile.proxyServerConfig;
+      }
+
+      await chromeStore.set(legacyData);
     },
     []
   );
 
-  const syncToLegacyKeys = (allProfiles: Profile[]) => {
-    const enabledProfile = allProfiles.find((p) => p.enabled);
-
-    if (enabledProfile) {
-      chromeStore.set("headerConfig", enabledProfile.headerConfig);
-      chromeStore.set("scriptConfig", enabledProfile.scriptConfig);
-      chromeStore.set("codeConfig", enabledProfile.codeConfig);
-      if (enabledProfile.proxyServerConfig) {
-        chromeStore.set("proxyServerConfig", enabledProfile.proxyServerConfig);
-      }
-    } else {
-      chromeStore.set("headerConfig", []);
-      chromeStore.set("scriptConfig", []);
-      chromeStore.set("codeConfig", []);
-    }
-  };
-
-  const handleActiveProfileChange = async (id: string) => {
-    setActiveProfileId(id);
-    await chromeStore.set("activeProfileId", id);
-  };
-
-  const handleProfilesChange = (newProfiles: Profile[]) => {
-    saveProfiles(newProfiles);
+  const handleProfilesChange = (newProfiles: Profile[], newActiveId?: string) => {
+    saveProfiles(newProfiles, newActiveId);
   };
 
   const updateActiveProfile = (updater: (profile: Profile) => Profile) => {
@@ -172,7 +167,6 @@ const Popup = () => {
         profiles={profiles}
         activeProfileId={activeProfileId}
         onProfileChange={handleProfilesChange}
-        onActiveProfileChange={handleActiveProfileChange}
       />
 
       {/* 主内容区：左侧导航 + 右侧内容 */}

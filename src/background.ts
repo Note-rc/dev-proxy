@@ -211,13 +211,6 @@ async function getAllDynamicRuleIds() {
   return rules.map((rule) => rule.id);
 }
 
-async function clearAllDynamicRules() {
-  const allRuleIds = await getAllDynamicRuleIds();
-  await chrome.declarativeNetRequest.updateDynamicRules({
-    removeRuleIds: allRuleIds,
-  });
-}
-
 // 更新重定向规则
 async function updateRedirectRules() {
   try {
@@ -225,11 +218,12 @@ async function updateRedirectRules() {
       "🚀 ~开始 更新重定向规则 - scriptConfig:",
       scriptConfig,
       "redirectConfig:",
-      redirectConfig
+      redirectConfig,
+      "headerConfig:",
+      headerConfig
     );
-    // 首先移除所有现有规则
-    await clearAllDynamicRules();
 
+    const removeRuleIds = await getAllDynamicRuleIds();
     const rulesToAdd: chrome.declarativeNetRequest.Rule[] = [];
 
     // 如果脚本替换功能启用，添加所有启用的脚本替换规则
@@ -298,6 +292,7 @@ async function updateRedirectRules() {
           const ruleId = HEADER_MODIFY_BASE_ID + index;
 
           const condition: Record<string, any> = {
+            urlFilter: rule.urlPattern || "*",
             resourceTypes: [
               "main_frame" as chrome.declarativeNetRequest.ResourceType,
               "sub_frame" as chrome.declarativeNetRequest.ResourceType,
@@ -309,10 +304,6 @@ async function updateRedirectRules() {
               "other" as chrome.declarativeNetRequest.ResourceType,
             ],
           };
-
-          if (rule.urlPattern) {
-            condition.urlFilter = rule.urlPattern;
-          }
 
           const headerRule = {
             id: ruleId,
@@ -336,19 +327,18 @@ async function updateRedirectRules() {
       });
     }
 
-    // 批量添加规则
-    if (rulesToAdd.length > 0) {
-      await chrome.declarativeNetRequest.updateDynamicRules({
-        addRules: rulesToAdd,
-      });
-      console.log(
-        "🚀 ~ 所有重定向规则已更新，共添加",
-        rulesToAdd.length,
-        "条规则"
-      );
-    } else {
-      console.log("🚀 ~ 没有启用的规则需要添加");
-    }
+    // 原子化更新：同时移除旧规则和添加新规则，避免中间状态
+    await chrome.declarativeNetRequest.updateDynamicRules({
+      removeRuleIds,
+      addRules: rulesToAdd,
+    });
+    console.log(
+      "🚀 ~ 规则已更新，移除",
+      removeRuleIds.length,
+      "条旧规则，添加",
+      rulesToAdd.length,
+      "条新规则"
+    );
   } catch (error) {
     console.error("更新重定向规则失败:", error);
   }

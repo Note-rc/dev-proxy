@@ -14,15 +14,13 @@ import t from "../../i18n";
 interface ProfileManagerProps {
   profiles: Profile[];
   activeProfileId: string;
-  onProfileChange: (profiles: Profile[]) => void;
-  onActiveProfileChange: (id: string) => void;
+  onProfileChange: (profiles: Profile[], activeId?: string) => void;
 }
 
 const ProfileManager = ({
   profiles,
   activeProfileId,
   onProfileChange,
-  onActiveProfileChange,
 }: ProfileManagerProps) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
@@ -43,8 +41,7 @@ const ProfileManager = ({
       ...p,
       enabled: p.id === id,
     }));
-    onProfileChange(newProfiles);
-    onActiveProfileChange(id);
+    onProfileChange(newProfiles, id);
   };
 
   const handleTogglePause = () => {
@@ -70,8 +67,7 @@ const ProfileManager = ({
     };
     const newProfiles = profiles.map((p) => ({ ...p, enabled: false }));
     newProfiles.push(newProfile);
-    onProfileChange(newProfiles);
-    onActiveProfileChange(newProfile.id);
+    onProfileChange(newProfiles, newProfile.id);
   };
 
   const handleDuplicateProfile = () => {
@@ -84,8 +80,7 @@ const ProfileManager = ({
     };
     const newProfiles = profiles.map((p) => ({ ...p, enabled: false }));
     newProfiles.push(newProfile);
-    onProfileChange(newProfiles);
-    onActiveProfileChange(newProfile.id);
+    onProfileChange(newProfiles, newProfile.id);
   };
 
   const handleDeleteProfile = (id: string) => {
@@ -93,9 +88,10 @@ const ProfileManager = ({
     const newProfiles = profiles.filter((p) => p.id !== id);
     if (activeProfileId === id) {
       newProfiles[0].enabled = true;
-      onActiveProfileChange(newProfiles[0].id);
+      onProfileChange(newProfiles, newProfiles[0].id);
+    } else {
+      onProfileChange(newProfiles);
     }
-    onProfileChange(newProfiles);
   };
 
   const handleStartRename = (profile: Profile) => {
@@ -115,7 +111,7 @@ const ProfileManager = ({
   };
 
   return (
-    <div className="flex items-center gap-2 px-3 py-2 bg-[#f0f2f5] border-b border-[#ddd] min-h-[36px]">
+    <div className="flex items-center gap-2 px-3 py-2 bg-[#f0f2f5] border-b border-[#ddd] min-h-[36px] max-h-[36px]">
       {/* 场景切换按钮组 */}
       <div className="flex items-center gap-1 flex-1 min-w-0 overflow-x-auto scrollbar-hide">
         {profiles.map((profile) => (
