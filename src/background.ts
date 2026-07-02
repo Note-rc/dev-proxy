@@ -132,17 +132,25 @@ async function setProxyConfig(config: ProxyConfig) {
 
 // 初始化配置
 const initConfig = async () => {
+  // 优先尝试加载 profiles（新版本格式）
+  const profiles = await chromeStore.get("profiles");
+  if (profiles && Array.isArray(profiles) && profiles.length > 0) {
+    loadFromProfiles(profiles);
+    console.log("🚀 ~ 从 profiles 初始化配置完成");
+    updateRedirectRules();
+    return;
+  }
+
+  // 兼容旧数据格式
   const scriptData = await chromeStore.get("scriptConfig");
   const codeConfig = await chromeStore.get("codeConfig");
   const headerData = await chromeStore.get("headerConfig");
   const proxyData = await chromeStore.get("proxyServerConfig");
 
-  // 兼容旧数据：如果是单个对象，转换为数组
   if (scriptData) {
     if (Array.isArray(scriptData)) {
       scriptConfig = scriptData;
     } else {
-      // 旧格式转换为新格式
       scriptConfig = [
         {
           id: Date.now().toString(),
@@ -158,12 +166,10 @@ const initConfig = async () => {
     scriptConfig = [];
   }
 
-  // 兼容旧数据：如果是单个对象，转换为数组
   if (codeConfig) {
     if (Array.isArray(codeConfig)) {
       redirectConfig = codeConfig;
     } else {
-      // 旧格式转换为新格式
       redirectConfig = [
         {
           id: Date.now().toString(),
@@ -177,19 +183,16 @@ const initConfig = async () => {
     redirectConfig = [];
   }
 
-  // 初始化请求头配置
   if (headerData && Array.isArray(headerData)) {
     headerConfig = headerData;
   } else {
     headerConfig = [];
   }
 
-  // 初始化代理配置
   if (proxyData) {
     proxyConfig = proxyData as ProxyConfig;
     await setProxyConfig(proxyConfig);
   } else {
-    // 默认使用直接连接
     proxyConfig = {
       mode: ProxyMode.DIRECT,
       rules: [],
@@ -351,6 +354,26 @@ async function updateRedirectRules() {
   }
 }
 
+// 从 profiles 中加载当前启用的配置（互斥，只有一个启用）
+function loadFromProfiles(profiles: any[]) {
+  const enabledProfile = profiles.find((p: any) => p.enabled);
+
+  if (enabledProfile) {
+    scriptConfig = enabledProfile.scriptConfig || [];
+    redirectConfig = enabledProfile.codeConfig || [];
+    headerConfig = enabledProfile.headerConfig || [];
+
+    if (enabledProfile.proxyServerConfig) {
+      proxyConfig = enabledProfile.proxyServerConfig as ProxyConfig;
+      setProxyConfig(proxyConfig);
+    }
+  } else {
+    scriptConfig = [];
+    redirectConfig = [];
+    headerConfig = [];
+  }
+}
+
 // 监听存储变化
 chrome.storage.onChanged.addListener((changes, area) => {
   console.log("🚀 ~ 配置监听:", changes["dev-proxy"]?.newValue, area);
@@ -359,72 +382,73 @@ chrome.storage.onChanged.addListener((changes, area) => {
     const newValue = changes["dev-proxy"].newValue;
     let shouldUpdate = false;
 
-    // 监听脚本配置变化
-    if (newValue.scriptConfig !== undefined) {
-      const scriptData = newValue.scriptConfig;
-      // 兼容旧数据：如果是单个对象，转换为数组
-      if (Array.isArray(scriptData)) {
-        scriptConfig = scriptData;
-      } else if (scriptData && typeof scriptData === "object") {
-        scriptConfig = [
-          {
-            id: Date.now().toString(),
-            scriptUrl: scriptData.scriptUrl,
-            replacementContent: scriptData.replacementContent,
-            isGlobal: scriptData.isGlobal ?? true,
-            specificUrl: scriptData.specificUrl,
-            enabled: scriptData.enabled ?? true,
-          },
-        ];
-      } else {
-        scriptConfig = [];
-      }
-      console.log("🚀 ~ 脚本配置已更新:", scriptConfig);
+    // 优先使用 profiles 数据（新版本格式）
+    if (newValue.profiles !== undefined && Array.isArray(newValue.profiles)) {
+      loadFromProfiles(newValue.profiles);
+      console.log("🚀 ~ 从 profiles 加载配置完成");
       shouldUpdate = true;
-    }
-
-    // 监听重定向配置变化
-    if (newValue.codeConfig !== undefined) {
-      const codeConfig = newValue.codeConfig;
-      // 兼容旧数据：如果是单个对象，转换为数组
-      if (Array.isArray(codeConfig)) {
-        redirectConfig = codeConfig;
-      } else if (codeConfig && typeof codeConfig === "object") {
-        redirectConfig = [
-          {
-            id: Date.now().toString(),
-            codeUrl: codeConfig.codeUrl,
-            redirectUrl: codeConfig.redirectUrl,
-            enabled: codeConfig.enabled ?? true,
-          },
-        ];
-      } else {
-        redirectConfig = [];
+    } else {
+      // 兼容旧格式的逐项监听
+      if (newValue.scriptConfig !== undefined) {
+        const scriptData = newValue.scriptConfig;
+        if (Array.isArray(scriptData)) {
+          scriptConfig = scriptData;
+        } else if (scriptData && typeof scriptData === "object") {
+          scriptConfig = [
+            {
+              id: Date.now().toString(),
+              scriptUrl: scriptData.scriptUrl,
+              replacementContent: scriptData.replacementContent,
+              isGlobal: scriptData.isGlobal ?? true,
+              specificUrl: scriptData.specificUrl,
+              enabled: scriptData.enabled ?? true,
+            },
+          ];
+        } else {
+          scriptConfig = [];
+        }
+        console.log("🚀 ~ 脚本配置已更新:", scriptConfig);
+        shouldUpdate = true;
       }
-      console.log("🚀 ~ 重定向配置已更新:", redirectConfig);
-      shouldUpdate = true;
-    }
 
-    // 监听请求头配置变化
-    if (newValue.headerConfig !== undefined) {
-      const headerData = newValue.headerConfig;
-      if (Array.isArray(headerData)) {
-        headerConfig = headerData;
-      } else {
-        headerConfig = [];
+      if (newValue.codeConfig !== undefined) {
+        const codeConfig = newValue.codeConfig;
+        if (Array.isArray(codeConfig)) {
+          redirectConfig = codeConfig;
+        } else if (codeConfig && typeof codeConfig === "object") {
+          redirectConfig = [
+            {
+              id: Date.now().toString(),
+              codeUrl: codeConfig.codeUrl,
+              redirectUrl: codeConfig.redirectUrl,
+              enabled: codeConfig.enabled ?? true,
+            },
+          ];
+        } else {
+          redirectConfig = [];
+        }
+        console.log("🚀 ~ 重定向配置已更新:", redirectConfig);
+        shouldUpdate = true;
       }
-      console.log("🚀 ~ 请求头配置已更新:", headerConfig);
-      shouldUpdate = true;
+
+      if (newValue.headerConfig !== undefined) {
+        const headerData = newValue.headerConfig;
+        if (Array.isArray(headerData)) {
+          headerConfig = headerData;
+        } else {
+          headerConfig = [];
+        }
+        console.log("🚀 ~ 请求头配置已更新:", headerConfig);
+        shouldUpdate = true;
+      }
+
+      if (newValue.proxyServerConfig !== undefined) {
+        proxyConfig = newValue.proxyServerConfig as ProxyConfig;
+        console.log("🚀 ~ 代理配置已更新:", proxyConfig);
+        setProxyConfig(proxyConfig);
+      }
     }
 
-    // 监听代理配置变化
-    if (newValue.proxyServerConfig !== undefined) {
-      proxyConfig = newValue.proxyServerConfig as ProxyConfig;
-      console.log("🚀 ~ 代理配置已更新:", proxyConfig);
-      setProxyConfig(proxyConfig);
-    }
-
-    // 如果任一配置发生变化，更新规则
     if (shouldUpdate) {
       updateRedirectRules();
     }

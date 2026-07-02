@@ -25,6 +25,15 @@ const en = {
   "popup.configCenter": "Settings",
   "popup.openConfigCenter": "Open Settings",
 
+  // Scene
+  "scene.add": "Add Scene",
+  "scene.delete": "Delete Scene",
+  "scene.duplicate": "Duplicate Scene",
+  "scene.rename": "Rename",
+  "scene.pause": "Pause current scene",
+  "scene.resume": "Resume current scene",
+  "scene.defaultName": "Scene",
+
   // Proxy Tool
   "proxy.mode": "Proxy Mode",
   "proxy.system": "System Proxy",

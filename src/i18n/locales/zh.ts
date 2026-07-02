@@ -25,6 +25,15 @@ const zh = {
   "popup.configCenter": "配置中心",
   "popup.openConfigCenter": "打开配置中心",
 
+  // Scene
+  "scene.add": "新增场景",
+  "scene.delete": "删除场景",
+  "scene.duplicate": "复制场景",
+  "scene.rename": "重命名",
+  "scene.pause": "暂停当前场景",
+  "scene.resume": "恢复当前场景",
+  "scene.defaultName": "场景",
+
   // Proxy Tool
   "proxy.mode": "代理模式",
   "proxy.system": "系统代理",
