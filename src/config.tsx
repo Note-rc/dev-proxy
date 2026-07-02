@@ -506,7 +506,10 @@ const ConfigPage: React.FC = () => {
 
     if (savedProfiles && Array.isArray(savedProfiles) && savedProfiles.length > 0) {
       setProfiles(savedProfiles);
-      setActiveProfileId(savedActiveId || savedProfiles[0].id);
+      const validId = savedProfiles.find((p: Profile) => p.id === savedActiveId)
+        ? savedActiveId
+        : savedProfiles[0].id;
+      setActiveProfileId(validId);
     } else {
       const defaultProfile: Profile = {
         id: "1",
@@ -520,35 +523,32 @@ const ConfigPage: React.FC = () => {
       };
       setProfiles([defaultProfile]);
       setActiveProfileId(defaultProfile.id);
-      await chromeStore.set("profiles", [defaultProfile]);
-      await chromeStore.set("activeProfileId", defaultProfile.id);
+      await chromeStore.set({
+        profiles: [defaultProfile],
+        activeProfileId: defaultProfile.id,
+      });
     }
   };
 
-  const saveProfiles = async (newProfiles: Profile[]) => {
+  const saveProfiles = async (newProfiles: Profile[], newActiveId?: string) => {
+    const resolvedActiveId = newActiveId || activeProfileId;
     setProfiles(newProfiles);
-    await chromeStore.set("profiles", newProfiles);
+    if (newActiveId) setActiveProfileId(newActiveId);
 
     const enabledProfile = newProfiles.find((p) => p.enabled);
-    if (enabledProfile) {
-      chromeStore.set("headerConfig", enabledProfile.headerConfig);
-      chromeStore.set("scriptConfig", enabledProfile.scriptConfig);
-      chromeStore.set("codeConfig", enabledProfile.codeConfig);
-      if (enabledProfile.proxyServerConfig) {
-        chromeStore.set("proxyServerConfig", enabledProfile.proxyServerConfig);
-      }
-    } else {
-      chromeStore.set("headerConfig", []);
-      chromeStore.set("scriptConfig", []);
-      chromeStore.set("codeConfig", []);
-    }
+    await chromeStore.set({
+      profiles: newProfiles,
+      activeProfileId: resolvedActiveId,
+      headerConfig: enabledProfile?.headerConfig || [],
+      scriptConfig: enabledProfile?.scriptConfig || [],
+      codeConfig: enabledProfile?.codeConfig || [],
+      proxyServerConfig: enabledProfile?.proxyServerConfig || null,
+    });
   };
 
   const handleSceneSwitch = (id: string) => {
     const newProfiles = profiles.map((p) => ({ ...p, enabled: p.id === id }));
-    setActiveProfileId(id);
-    chromeStore.set("activeProfileId", id);
-    saveProfiles(newProfiles);
+    saveProfiles(newProfiles, id);
   };
 
   const updateCurrentProfile = (updater: (p: Profile) => Profile) => {
@@ -564,9 +564,15 @@ const ConfigPage: React.FC = () => {
     setLocaleState(next);
   };
 
-  if (!ready || profiles.length === 0) return null;
+  const currentProfile = profiles.find((p) => p.id === activeProfileId) || profiles[0];
 
-  const currentProfile = profiles.find((p) => p.id === activeProfileId);
+  useEffect(() => {
+    if (currentProfile && currentProfile.id !== activeProfileId) {
+      setActiveProfileId(currentProfile.id);
+    }
+  }, [currentProfile, activeProfileId]);
+
+  if (!ready || profiles.length === 0) return null;
   if (!currentProfile) return null;
 
   const configs = [

@@ -16,7 +16,13 @@ const Popup = () => {
   const [activeProfileId, setActiveProfileId] = useState<string>("");
   const [loaded, setLoaded] = useState(false);
 
-  const activeProfile = profiles.find((p) => p.id === activeProfileId);
+  const activeProfile = profiles.find((p) => p.id === activeProfileId) || profiles[0];
+
+  useEffect(() => {
+    if (activeProfile && activeProfile.id !== activeProfileId) {
+      setActiveProfileId(activeProfile.id);
+    }
+  }, [activeProfile, activeProfileId]);
 
   useEffect(() => {
     loadProfiles();
@@ -28,7 +34,10 @@ const Popup = () => {
 
     if (savedProfiles && Array.isArray(savedProfiles) && savedProfiles.length > 0) {
       setProfiles(savedProfiles);
-      setActiveProfileId(savedActiveId || savedProfiles[0].id);
+      const validId = savedProfiles.find((p: Profile) => p.id === savedActiveId)
+        ? savedActiveId
+        : savedProfiles[0].id;
+      setActiveProfileId(validId);
     } else {
       await migrateOldData();
     }
@@ -61,32 +70,32 @@ const Popup = () => {
 
     setProfiles([defaultProfile]);
     setActiveProfileId(defaultProfile.id);
-    await chromeStore.set("profiles", [defaultProfile]);
-    await chromeStore.set("activeProfileId", defaultProfile.id);
+    await chromeStore.set({
+      profiles: [defaultProfile],
+      activeProfileId: defaultProfile.id,
+    });
   };
+
+  const activeProfileIdRef = React.useRef(activeProfileId);
+  activeProfileIdRef.current = activeProfileId;
 
   const saveProfiles = useCallback(
     async (newProfiles: Profile[], newActiveId?: string) => {
+      const resolvedActiveId = newActiveId || activeProfileIdRef.current;
       setProfiles(newProfiles);
       if (newActiveId) {
         setActiveProfileId(newActiveId);
       }
 
       const enabledProfile = newProfiles.find((p) => p.enabled);
-      const legacyData: Record<string, any> = {
+      await chromeStore.set({
         profiles: newProfiles,
+        activeProfileId: resolvedActiveId,
         headerConfig: enabledProfile?.headerConfig || [],
         scriptConfig: enabledProfile?.scriptConfig || [],
         codeConfig: enabledProfile?.codeConfig || [],
-      };
-      if (newActiveId) {
-        legacyData.activeProfileId = newActiveId;
-      }
-      if (enabledProfile?.proxyServerConfig) {
-        legacyData.proxyServerConfig = enabledProfile.proxyServerConfig;
-      }
-
-      await chromeStore.set(legacyData);
+        proxyServerConfig: enabledProfile?.proxyServerConfig || null,
+      });
     },
     []
   );

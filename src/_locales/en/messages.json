@@ -4,7 +4,7 @@
     "description": "Extension name"
   },
   "appDescription": {
-    "message": "Lightweight developer proxy tool. Modify HTTP headers, replace routes & scripts, redirect JS files, and configure proxy servers. Switch between multiple scenes instantly.",
+    "message": "Dev proxy tool: modify headers, route/script replace, JS redirect, proxy config. Multi-scene switching.",
     "description": "Extension description"
   }
 }
