@@ -7,7 +7,12 @@ import ProxyContent from "./tools/ProxyContent";
 ProxyContent();
 
 function isContextValid() {
-  return !!(chrome.runtime && chrome.runtime.id);
+  try {
+    return !!(chrome?.runtime && chrome.runtime.id);
+  } catch {
+    // 扩展被重载/禁用后，访问 chrome.runtime 可能直接抛错：Extension context invalidated
+    return false;
+  }
 }
 
 // 报告当前页面的URL

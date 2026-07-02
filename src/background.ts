@@ -27,7 +27,7 @@ interface HeaderRule {
   id: string;
   headerName: string;
   headerValue: string;
-  urlPattern: string;
+  urlPattern?: string;
   enabled: boolean;
 }
 
@@ -292,7 +292,7 @@ async function updateRedirectRules() {
           const ruleId = HEADER_MODIFY_BASE_ID + index;
 
           const condition: Record<string, any> = {
-            urlFilter: rule.urlPattern || "*",
+            urlFilter: "*",
             resourceTypes: [
               "main_frame" as chrome.declarativeNetRequest.ResourceType,
               "sub_frame" as chrome.declarativeNetRequest.ResourceType,

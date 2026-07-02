@@ -7,7 +7,7 @@ const en = {
   "common.add": "Add",
   "common.source": "Source",
   "common.target": "Target",
-  "common.match": "Match",
+
   "common.saveSuccess": "Saved successfully",
   "common.saveFailed": "Save failed",
   "common.statusUpdated": "Status updated",
@@ -79,7 +79,7 @@ const en = {
   "header.configuredRules": "Configured Header Rules",
   "header.namePlaceholder": "Header name (e.g., X-Custom-Token)",
   "header.valuePlaceholder": "Header value",
-  "header.urlPatternPlaceholder": "URL pattern (leave empty to match all requests)",
+
   "header.nameRequired": "Please enter the header name",
   "header.valueRequired": "Please enter the header value",
 
@@ -105,7 +105,7 @@ const en = {
   "config.replacement": "Replacement",
   "config.sourceJs": "Source JS",
   "config.redirectTo": "Redirect to",
-  "config.urlMatch": "URL Match",
+
   "config.addRouteRule": "+ Add Route Rule",
   "config.addScriptRule": "+ Add Script Replace Rule",
   "config.addRedirectRule": "+ Add JS Redirect Rule",
@@ -119,7 +119,7 @@ const en = {
   "config.redirectTargetPlaceholder": "Redirect target URL",
   "config.headerNamePlaceholder": "Header name (e.g., X-Custom-Token)",
   "config.headerValuePlaceholder": "Header value",
-  "config.urlPatternPlaceholder": "URL pattern (leave empty to match all)",
+
   "config.proxyMode": "Proxy Mode",
   "config.proxyServerSettings": "Proxy Server Settings",
   "config.whistleTip": "Recommended to use with",

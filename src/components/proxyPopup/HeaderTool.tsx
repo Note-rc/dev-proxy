@@ -7,7 +7,7 @@ export interface HeaderRule {
   id: string;
   headerName: string;
   headerValue: string;
-  urlPattern: string;
+  urlPattern?: string;
   enabled: boolean;
 }
 
@@ -45,7 +45,6 @@ const HeaderTool = ({ onSubmit, initialValue }: IProps) => {
 
     const headerName = (formData.get("headerName") as string)?.trim();
     const headerValue = (formData.get("headerValue") as string)?.trim();
-    const urlPattern = (formData.get("urlPattern") as string)?.trim();
 
     if (!headerName) {
       setMessage(t("header.nameRequired"));
@@ -62,7 +61,7 @@ const HeaderTool = ({ onSubmit, initialValue }: IProps) => {
     if (editingRule) {
       newRules = rules.map((rule) =>
         rule.id === editingRule.id
-          ? { ...rule, headerName, headerValue, urlPattern: urlPattern || "" }
+          ? { ...rule, headerName, headerValue }
           : rule
       );
     } else {
@@ -70,7 +69,6 @@ const HeaderTool = ({ onSubmit, initialValue }: IProps) => {
         id: Date.now().toString(),
         headerName,
         headerValue,
-        urlPattern: urlPattern || "",
         enabled: true,
       };
       newRules = [...rules, newRule];
@@ -144,7 +142,7 @@ const HeaderTool = ({ onSubmit, initialValue }: IProps) => {
                   key={rule.id}
                   className="mb-2 p-2 border border-[#ddd] rounded bg-white"
                 >
-                  <div className="flex items-start justify-between mb-1">
+                  <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center gap-2 flex-1">
                       <Checkbox.Root
                         className="w-4 h-4 flex items-center justify-center border border-[#ddd] rounded bg-white shrink-0"
@@ -156,15 +154,10 @@ const HeaderTool = ({ onSubmit, initialValue }: IProps) => {
                         </Checkbox.Indicator>
                       </Checkbox.Root>
                       <div className="flex-1 min-w-0">
-                        <div className="text-xs text-[#333] break-all">
+                        <div className="text-xs text-[#333] break-all leading-4">
                           <span className="font-medium">{rule.headerName}:</span>{" "}
                           {rule.headerValue}
                         </div>
-                        {rule.urlPattern && (
-                          <div className="text-xs text-[#999] break-all mt-1">
-                            <span className="font-medium">{t("common.match")}:</span> {rule.urlPattern}
-                          </div>
-                        )}
                       </div>
                     </div>
                     <div className="flex gap-1 ml-2 shrink-0">
@@ -223,17 +216,6 @@ const HeaderTool = ({ onSubmit, initialValue }: IProps) => {
                   placeholder={t("header.valuePlaceholder")}
                   defaultValue={editingRule?.headerValue || ""}
                   onChange={() => message && setMessage("")}
-                  className="w-full box-border border border-[#ddd] rounded text-xs p-2"
-                />
-              </Form.Control>
-            </Form.Field>
-
-            <Form.Field className="my-2 w-full" name="urlPattern">
-              <Form.Control asChild>
-                <input
-                  name="urlPattern"
-                  placeholder={t("header.urlPatternPlaceholder")}
-                  defaultValue={editingRule?.urlPattern || ""}
                   className="w-full box-border border border-[#ddd] rounded text-xs p-2"
                 />
               </Form.Control>

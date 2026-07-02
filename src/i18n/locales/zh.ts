@@ -7,7 +7,7 @@ const zh = {
   "common.add": "添加",
   "common.source": "源",
   "common.target": "目标",
-  "common.match": "匹配",
+
   "common.saveSuccess": "保存成功",
   "common.saveFailed": "保存失败",
   "common.statusUpdated": "状态已更新",
@@ -79,7 +79,7 @@ const zh = {
   "header.configuredRules": "已配置的请求头规则",
   "header.namePlaceholder": "Header 名称（如：X-Custom-Token）",
   "header.valuePlaceholder": "Header 值",
-  "header.urlPatternPlaceholder": "URL 匹配（留空则匹配所有请求）",
+
   "header.nameRequired": "请填写 Header 名称",
   "header.valueRequired": "请填写 Header 值",
 
@@ -105,7 +105,7 @@ const zh = {
   "config.replacement": "替换内容",
   "config.sourceJs": "源JS",
   "config.redirectTo": "重定向至",
-  "config.urlMatch": "URL匹配",
+
   "config.addRouteRule": "+ 添加新的路由规则",
   "config.addScriptRule": "+ 添加脚本替换规则",
   "config.addRedirectRule": "+ 添加JS重定向规则",
@@ -119,7 +119,7 @@ const zh = {
   "config.redirectTargetPlaceholder": "重定向到的URL",
   "config.headerNamePlaceholder": "Header 名称（如：X-Custom-Token）",
   "config.headerValuePlaceholder": "Header 值",
-  "config.urlPatternPlaceholder": "URL 匹配（留空则匹配所有请求）",
+
   "config.proxyMode": "代理模式",
   "config.proxyServerSettings": "代理服务器设置",
   "config.whistleTip": "建议配合",

@@ -306,7 +306,7 @@ const HeaderConfigPanel: React.FC<{
   const [localRules, setLocalRules] = useState<HeaderRule[]>(rules);
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [formData, setFormData] = useState({ headerName: "", headerValue: "", urlPattern: "" });
+  const [formData, setFormData] = useState({ headerName: "", headerValue: "" });
 
   useEffect(() => { setLocalRules(rules); }, [rules]);
 
@@ -325,7 +325,7 @@ const HeaderConfigPanel: React.FC<{
     } else {
       saveRules([...localRules, { id: Date.now().toString(), ...formData, enabled: true }]);
     }
-    setFormData({ headerName: "", headerValue: "", urlPattern: "" });
+    setFormData({ headerName: "", headerValue: "" });
     setIsAdding(false);
   };
 
@@ -344,11 +344,10 @@ const HeaderConfigPanel: React.FC<{
                 </div>
                 <div className="space-y-1 text-sm">
                   <div><span className="font-semibold text-gray-700">{rule.headerName}:</span> <span className="text-gray-600">{rule.headerValue}</span></div>
-                  {rule.urlPattern && <div><span className="font-semibold text-gray-700">{t("config.urlMatch")}：</span><span className="text-gray-600">{rule.urlPattern}</span></div>}
                 </div>
               </div>
               <div className="flex gap-2">
-                <button onClick={() => { setFormData({ headerName: rule.headerName, headerValue: rule.headerValue, urlPattern: rule.urlPattern }); setEditingId(rule.id); setIsAdding(true); }}
+                <button onClick={() => { setFormData({ headerName: rule.headerName, headerValue: rule.headerValue }); setEditingId(rule.id); setIsAdding(true); }}
                   className="px-3 py-1 text-sm bg-orange-500 text-white rounded hover:bg-orange-600">{t("common.edit")}</button>
                 <button onClick={() => saveRules(localRules.filter((r) => r.id !== rule.id))}
                   className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600">{t("common.delete")}</button>
@@ -364,10 +363,9 @@ const HeaderConfigPanel: React.FC<{
           <h4 className="font-bold text-lg text-gray-800">{editingId ? t("common.editRule") : t("common.newRule")}</h4>
           <input value={formData.headerName} onChange={(e) => setFormData({ ...formData, headerName: e.target.value })} placeholder={t("config.headerNamePlaceholder")} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" required />
           <input value={formData.headerValue} onChange={(e) => setFormData({ ...formData, headerValue: e.target.value })} placeholder={t("config.headerValuePlaceholder")} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" required />
-          <input value={formData.urlPattern} onChange={(e) => setFormData({ ...formData, urlPattern: e.target.value })} placeholder={t("config.urlPatternPlaceholder")} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" />
           <div className="flex gap-3">
             <button type="submit" className="flex-1 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-medium">{t("common.save")}</button>
-            <button type="button" onClick={() => { setIsAdding(false); setEditingId(null); setFormData({ headerName: "", headerValue: "", urlPattern: "" }); }} className="flex-1 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium">{t("common.cancel")}</button>
+            <button type="button" onClick={() => { setIsAdding(false); setEditingId(null); setFormData({ headerName: "", headerValue: "" }); }} className="flex-1 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium">{t("common.cancel")}</button>
           </div>
         </form>
       )}
