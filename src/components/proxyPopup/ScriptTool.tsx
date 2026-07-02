@@ -96,10 +96,10 @@ const ScriptTool = ({ onSubmit, initialValue }: IProps) => {
       setOpen(true);
     }
 
-    // 3秒后隐藏提示
+    // 1.5秒后隐藏提示
     setTimeout(() => {
       setOpen(false);
-    }, 3000);
+    }, 1000);
   };
 
   const handleToggleEnabled = async (ruleId: string) => {
@@ -114,12 +114,12 @@ const ScriptTool = ({ onSubmit, initialValue }: IProps) => {
       setToastType("success");
       setToastMessage(t("common.statusUpdated"));
       setOpen(true);
-      setTimeout(() => setOpen(false), 3000);
+      setTimeout(() => setOpen(false), 1000);
     } catch (error) {
       setToastType("error");
       setToastMessage(t("common.updateFailed"));
       setOpen(true);
-      setTimeout(() => setOpen(false), 3000);
+      setTimeout(() => setOpen(false), 1000);
     }
   };
 
@@ -133,12 +133,12 @@ const ScriptTool = ({ onSubmit, initialValue }: IProps) => {
       setToastType("success");
       setToastMessage(t("common.deleteSuccess"));
       setOpen(true);
-      setTimeout(() => setOpen(false), 3000);
+      setTimeout(() => setOpen(false), 1000);
     } catch (error) {
       setToastType("error");
       setToastMessage(t("common.deleteFailed"));
       setOpen(true);
-      setTimeout(() => setOpen(false), 3000);
+      setTimeout(() => setOpen(false), 1000);
     }
   };
 

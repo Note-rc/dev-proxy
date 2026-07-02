@@ -35,7 +35,7 @@ const HeaderTool = ({ onSubmit, initialValue }: IProps) => {
     setToastType(type);
     setToastMessage(msg);
     setOpen(true);
-    setTimeout(() => setOpen(false), 3000);
+    setTimeout(() => setOpen(false), 1000);
   };
 
   const handleSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {

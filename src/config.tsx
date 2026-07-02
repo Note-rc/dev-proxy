@@ -400,14 +400,14 @@ const ProxyServerConfigPanel: React.FC<{
     setConfig(newConfig);
     onSave(newConfig);
     setMessage(t("proxy.modeUpdated"));
-    setTimeout(() => setMessage(""), 3000);
+    setTimeout(() => setMessage(""), 1000);
   };
 
   const handleServerSave = (e: React.FormEvent) => {
     e.preventDefault();
     onSave(config);
     setMessage(t("proxy.serverSaved"));
-    setTimeout(() => setMessage(""), 3000);
+    setTimeout(() => setMessage(""), 1000);
   };
 
   return (

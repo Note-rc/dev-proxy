@@ -72,7 +72,7 @@ const ProxyTool = ({ onSubmit, initialValue }: IProps) => {
     setToastType(type);
     setToastMessage(msg);
     setOpen(true);
-    setTimeout(() => setOpen(false), 3000);
+    setTimeout(() => setOpen(false), 1000);
   };
 
   // 切换代理模式
