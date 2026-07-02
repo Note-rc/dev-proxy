@@ -33,6 +33,7 @@ const zh = {
   "scene.pause": "暂停当前场景",
   "scene.resume": "恢复当前场景",
   "scene.defaultName": "场景",
+  "scene.active": "启用中",
 
   // Proxy Tool
   "proxy.mode": "代理模式",
@@ -88,8 +89,9 @@ const zh = {
   "config.scriptReplaceTitle": "脚本替换",
   "config.jsRedirectTitle": "JS 重定向",
   "config.proxyServerTitle": "代理服务器",
-  "config.title": "Dev Proxy 配置中心（由AI生成）",
+  "config.title": "Dev Proxy 配置中心",
   "config.subtitle": "管理你的开发代理工具配置",
+  "config.sceneSelect": "选择场景",
   "config.helpDoc": "📖 帮助文档",
   "config.headerDesc": "为请求添加或修改自定义Header",
   "config.routeDesc": "将特定URL请求代理到目标地址",
@@ -130,7 +132,7 @@ const zh = {
 
   // Help Page
   "help.title": "Dev Proxy",
-  "help.subtitle": "开发者代理工具 - 帮助文档（以下由AI生成）",
+  "help.subtitle": "开发者代理工具 - 帮助文档",
   "help.configCenter": "配置中心",
   "help.openConfigCenter": "打开配置中心",
   "help.featureOverview": "🎯 功能概览",

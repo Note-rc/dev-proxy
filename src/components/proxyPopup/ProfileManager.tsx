@@ -6,6 +6,7 @@ import {
   CopyIcon,
   PauseIcon,
   PlayIcon,
+  CheckCircledIcon,
 } from "@radix-ui/react-icons";
 import { Profile } from "./types";
 import t from "../../i18n";
@@ -35,6 +36,7 @@ const ProfileManager = ({
   }, [editingId]);
 
   const activeProfile = profiles.find((p) => p.id === activeProfileId);
+  const hasEnabledProfile = profiles.some((p) => p.enabled);
 
   const handleSwitchProfile = (id: string) => {
     const newProfiles = profiles.map((p) => ({
@@ -121,14 +123,14 @@ const ProfileManager = ({
             key={profile.id}
             onClick={() => handleSwitchProfile(profile.id)}
             onDoubleClick={() => handleStartRename(profile)}
-            className={`px-2 py-1 text-xs rounded transition-all truncate max-w-[100px] shrink-0 ${
-              profile.id === activeProfileId && profile.enabled
+            className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded transition-all shrink-0 ${
+              profile.enabled
                 ? "bg-[#233895] text-white"
-                : profile.id === activeProfileId && !profile.enabled
-                ? "bg-[#666] text-white opacity-60"
+                : profile.id === activeProfileId
+                ? "bg-[#e8eaf6] text-[#233895] border border-[#233895]"
                 : "bg-white text-[#333] border border-[#ddd] hover:border-[#233895]"
             }`}
-            title={profile.name}
+            title={profile.name + (profile.enabled ? ` (${t("scene.active")})` : "")}
           >
             {editingId === profile.id ? (
               <input
@@ -144,10 +146,15 @@ const ProfileManager = ({
                   }
                 }}
                 onClick={(e) => e.stopPropagation()}
-                className="w-full bg-transparent border-none outline-none text-xs text-inherit"
+                className="w-16 bg-transparent border-none outline-none text-xs text-inherit"
               />
             ) : (
-              profile.name
+              <>
+                <span className="truncate max-w-[80px]">{profile.name}</span>
+                {profile.enabled && (
+                  <CheckCircledIcon className="w-3 h-3 shrink-0" />
+                )}
+              </>
             )}
           </button>
         ))}
@@ -158,11 +165,11 @@ const ProfileManager = ({
         <button
           onClick={handleTogglePause}
           className={`p-1 rounded hover:bg-[#e0e0e0] transition-colors ${
-            activeProfile?.enabled ? "text-[#52c41a]" : "text-[#ff4d4f]"
+            hasEnabledProfile ? "text-[#52c41a]" : "text-[#ff4d4f]"
           }`}
-          title={activeProfile?.enabled ? t("scene.pause") : t("scene.resume")}
+          title={hasEnabledProfile ? t("scene.pause") : t("scene.resume")}
         >
-          {activeProfile?.enabled ? (
+          {hasEnabledProfile ? (
             <PauseIcon className="w-3.5 h-3.5" />
           ) : (
             <PlayIcon className="w-3.5 h-3.5" />

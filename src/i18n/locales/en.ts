@@ -33,6 +33,7 @@ const en = {
   "scene.pause": "Pause current scene",
   "scene.resume": "Resume current scene",
   "scene.defaultName": "Scene",
+  "scene.active": "Active",
 
   // Proxy Tool
   "proxy.mode": "Proxy Mode",
@@ -88,8 +89,9 @@ const en = {
   "config.scriptReplaceTitle": "Script Replace",
   "config.jsRedirectTitle": "JS Redirect",
   "config.proxyServerTitle": "Proxy Server",
-  "config.title": "Dev Proxy Settings (AI Generated)",
+  "config.title": "Dev Proxy Settings",
   "config.subtitle": "Manage your development proxy tool settings",
+  "config.sceneSelect": "Select Scene",
   "config.helpDoc": "Help Docs",
   "config.headerDesc": "Add or modify custom headers for requests",
   "config.routeDesc": "Proxy specific URL requests to target addresses",
@@ -130,7 +132,7 @@ const en = {
 
   // Help Page
   "help.title": "Dev Proxy",
-  "help.subtitle": "Developer Proxy Tool - Help Documentation (AI Generated)",
+  "help.subtitle": "Developer Proxy Tool - Help Documentation",
   "help.configCenter": "Settings",
   "help.openConfigCenter": "Open Settings",
   "help.featureOverview": "Feature Overview",
