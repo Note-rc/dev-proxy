@@ -1,0 +1,35 @@
+{
+  "dashboardUrl": "https://dashboard.hellobook.xyz",
+  "projectId": "dev-proxy",
+  "projectName": "Dev Proxy",
+  "owners": [
+    "ruicai"
+  ],
+  "snapshotFile": ".dashboard/snapshot.json",
+  "analysis": {
+    "include": [
+      "README*",
+      "src/**",
+      "store-assets/**",
+      "package.json",
+      "webpack.config.js",
+      "tsconfig.json"
+    ],
+    "exclude": [
+      ".git/**",
+      ".env*",
+      "**/*.key",
+      "**/*.pem",
+      "**/*credential*",
+      "**/*secret*",
+      "node_modules/**",
+      "vendor/**",
+      "dist/**",
+      "build/**",
+      "coverage/**"
+    ],
+    "recentCommits": 20,
+    "maxFiles": 200,
+    "maxFileBytes": 200000
+  }
+}
