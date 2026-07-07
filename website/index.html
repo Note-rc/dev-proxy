@@ -1,0 +1,884 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DevProxy - Chrome Developer Proxy and Debugging Tool</title>
+    <meta
+      name="description"
+      content="DevProxy is a Chrome extension for frontend developers, with Header Modify, Route Replace, Script Replace, JS Redirect, proxy server configuration, and scenario switching."
+    />
+    <meta name="theme-color" content="#14213d" />
+    <meta property="og:title" content="DevProxy - Chrome Developer Proxy and Debugging Tool" />
+    <meta
+      property="og:description"
+      content="A lightweight, transparent Chrome extension focused on developer debugging. Manage headers, routes, scripts, redirects, and proxy configuration."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="assets/workflow.svg" />
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #152033;
+        --muted: #627086;
+        --line: #dbe3ef;
+        --paper: #f7f9fc;
+        --white: #ffffff;
+        --navy: #14213d;
+        --blue: #2563eb;
+        --teal: #0f766e;
+        --amber: #b45309;
+        --rose: #be123c;
+        --violet: #5b21b6;
+        --shadow: 0 22px 60px rgba(21, 32, 51, 0.16);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        background: var(--paper);
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        line-height: 1.6;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        border-bottom: 1px solid rgba(219, 227, 239, 0.78);
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(18px);
+      }
+
+      .nav {
+        width: min(1120px, calc(100% - 32px));
+        min-height: 68px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        font-weight: 760;
+      }
+
+      .brand img {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        color: #334155;
+        font-size: 14px;
+      }
+
+      .nav-links a {
+        text-decoration: none;
+      }
+
+      .nav-links a:hover {
+        color: var(--blue);
+      }
+
+      .hero {
+        min-height: calc(100svh - 68px);
+        display: grid;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        color: var(--white);
+        background:
+          linear-gradient(90deg, rgba(12, 19, 34, 0.94), rgba(12, 19, 34, 0.74) 42%, rgba(12, 19, 34, 0.34)),
+          linear-gradient(135deg, #1a2370 0%, #233895 50%, #3a4fb8 100%);
+      }
+
+      .hero::after {
+        content: "";
+        position: absolute;
+        inset: auto 0 0 0;
+        height: 118px;
+        background: linear-gradient(180deg, rgba(247, 249, 252, 0), var(--paper));
+      }
+
+      .hero-inner {
+        position: relative;
+        z-index: 1;
+        width: min(1120px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 78px 0 150px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0 0 18px;
+        color: #cbd5e1;
+        font-size: 14px;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+
+      .eyebrow::before {
+        content: "";
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #22c55e;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin-top: 0;
+      }
+
+      h1 {
+        max-width: 720px;
+        margin-bottom: 20px;
+        font-size: clamp(44px, 8vw, 86px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+
+      .hero-lead {
+        max-width: 700px;
+        margin-bottom: 30px;
+        color: #e2e8f0;
+        font-size: clamp(18px, 2.2vw, 24px);
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 34px;
+      }
+
+      .button {
+        min-height: 48px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 0 18px;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        font-weight: 760;
+        text-decoration: none;
+      }
+
+      .button.primary {
+        color: #0f172a;
+        background: #ffffff;
+      }
+
+      .button.secondary {
+        color: #ffffff;
+        border-color: rgba(255, 255, 255, 0.32);
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .trust-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        color: #e2e8f0;
+        font-size: 14px;
+      }
+
+      .trust-row span {
+        padding: 7px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        background: rgba(15, 23, 42, 0.28);
+      }
+
+      main {
+        position: relative;
+        z-index: 2;
+      }
+
+      section {
+        padding: 82px 0;
+      }
+
+      .wrap {
+        width: min(1120px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      .section-head {
+        max-width: 760px;
+        margin-bottom: 34px;
+      }
+
+      .section-kicker {
+        margin-bottom: 8px;
+        color: var(--teal);
+        font-size: 13px;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      h2 {
+        margin-bottom: 12px;
+        font-size: clamp(30px, 4vw, 48px);
+        line-height: 1.08;
+        letter-spacing: 0;
+      }
+
+      .subtle {
+        color: var(--muted);
+        font-size: 18px;
+      }
+
+      .grid {
+        display: grid;
+        gap: 16px;
+      }
+
+      .features {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+
+      .feature-card,
+      .case-card,
+      .step,
+      .permission {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--white);
+        box-shadow: 0 1px 1px rgba(21, 32, 51, 0.03);
+      }
+
+      .feature-card {
+        min-height: 210px;
+        padding: 20px;
+      }
+
+      .feature-card strong {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 18px;
+      }
+
+      .feature-card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .tag {
+        width: 38px;
+        height: 38px;
+        margin-bottom: 18px;
+        display: grid;
+        place-items: center;
+        border-radius: 8px;
+        color: #ffffff;
+        font-size: 13px;
+        font-weight: 900;
+      }
+
+      .tag.blue {
+        background: var(--blue);
+      }
+
+      .tag.teal {
+        background: var(--teal);
+      }
+
+      .tag.amber {
+        background: var(--amber);
+      }
+
+      .tag.rose {
+        background: var(--rose);
+      }
+
+      .tag.violet {
+        background: var(--violet);
+      }
+
+      .split {
+        display: grid;
+        grid-template-columns: 0.95fr 1.05fr;
+        gap: 28px;
+        align-items: center;
+      }
+
+      .product-shot {
+        overflow: hidden;
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+      }
+
+      .product-shot img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .copy-block {
+        padding: 8px 0;
+      }
+
+      .copy-block ul {
+        display: grid;
+        gap: 12px;
+        margin: 24px 0 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .copy-block li {
+        padding-left: 28px;
+        position: relative;
+        color: #334155;
+      }
+
+      .copy-block li::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 10px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--teal);
+      }
+
+      .use-cases {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .case-card {
+        padding: 22px;
+      }
+
+      .case-card h3 {
+        margin-bottom: 8px;
+        font-size: 18px;
+      }
+
+      .case-card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 15px;
+      }
+
+      .steps {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        counter-reset: step;
+      }
+
+      .step {
+        min-height: 168px;
+        padding: 22px;
+        counter-increment: step;
+      }
+
+      .step::before {
+        content: counter(step);
+        width: 34px;
+        height: 34px;
+        margin-bottom: 20px;
+        display: grid;
+        place-items: center;
+        border-radius: 8px;
+        color: #ffffff;
+        background: var(--navy);
+        font-weight: 800;
+      }
+
+      .step strong {
+        display: block;
+        margin-bottom: 6px;
+      }
+
+      .step p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .permissions {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .permission {
+        padding: 22px;
+      }
+
+      .permission code {
+        display: inline-block;
+        margin-bottom: 12px;
+        padding: 5px 8px;
+        border-radius: 6px;
+        color: #0f172a;
+        background: #e2e8f0;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 13px;
+      }
+
+      .permission p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .privacy-band {
+        color: #e5edf7;
+        background: #122033;
+      }
+
+      .privacy-band .section-kicker {
+        color: #5eead4;
+      }
+
+      .privacy-band .subtle {
+        color: #b9c5d7;
+      }
+
+      .privacy-list {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+        margin-top: 28px;
+      }
+
+      .privacy-list div {
+        padding: 22px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .privacy-list strong {
+        display: block;
+        margin-bottom: 8px;
+        color: #ffffff;
+      }
+
+      .privacy-list p {
+        margin: 0;
+        color: #b9c5d7;
+      }
+
+      .faq {
+        display: grid;
+        gap: 12px;
+      }
+
+      details {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--white);
+      }
+
+      summary {
+        cursor: pointer;
+        padding: 18px 20px;
+        font-weight: 760;
+      }
+
+      details p {
+        margin: 0;
+        padding: 0 20px 20px;
+        color: var(--muted);
+      }
+
+      .final-cta {
+        text-align: center;
+        color: #ffffff;
+        background: var(--teal);
+      }
+
+      .final-cta h2 {
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 760px;
+      }
+
+      .final-cta p {
+        max-width: 720px;
+        margin-left: auto;
+        margin-right: auto;
+        color: #d7fffa;
+      }
+
+      .final-cta .actions {
+        justify-content: center;
+        margin: 28px 0 0;
+      }
+
+      footer {
+        padding: 26px 0;
+        color: #64748b;
+        background: #ffffff;
+        border-top: 1px solid var(--line);
+      }
+
+      .footer-inner {
+        width: min(1120px, calc(100% - 32px));
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap;
+        font-size: 14px;
+      }
+
+      .footer-inner a {
+        color: #334155;
+        text-decoration: none;
+      }
+
+      @media (max-width: 980px) {
+        .features,
+        .use-cases,
+        .steps,
+        .permissions,
+        .privacy-list {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .split {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .nav {
+          align-items: flex-start;
+          padding: 14px 0;
+          flex-direction: column;
+        }
+
+        .nav-links {
+          width: 100%;
+          overflow-x: auto;
+          padding-bottom: 4px;
+          white-space: nowrap;
+        }
+
+        .hero {
+          min-height: auto;
+        }
+
+        .hero-inner {
+          padding: 66px 0 118px;
+        }
+
+        .features,
+        .use-cases,
+        .steps,
+        .permissions,
+        .privacy-list {
+          grid-template-columns: 1fr;
+        }
+
+        section {
+          padding: 62px 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <nav class="nav" aria-label="Primary navigation">
+        <a class="brand" href="#top" aria-label="DevProxy home">
+          <img src="assets/favicon.svg" alt="" />
+          <span>DevProxy</span>
+        </a>
+        <div class="nav-links">
+          <a href="#features">Features</a>
+          <a href="#workflow">Workflow</a>
+          <a href="#permissions">Permissions</a>
+          <a href="#privacy">Privacy</a>
+          <a href="https://github.com/Note-rc/dev-proxy" target="_blank" rel="noopener">GitHub</a>
+        </div>
+      </nav>
+    </header>
+
+    <section class="hero" id="top" aria-label="DevProxy overview">
+      <div class="hero-inner">
+        <p class="eyebrow">Manifest V3 Chrome Extension</p>
+        <h1>DevProxy</h1>
+        <p class="hero-lead">
+          A lightweight proxy and debugging tool for frontend developers. Manage request headers, route replacement,
+          script debugging, JS redirects, and proxy server configuration from one extension.
+        </p>
+        <div class="actions" aria-label="Primary actions">
+          <a class="button primary" href="#workflow">View Workflow</a>
+          <a class="button secondary" href="https://github.com/Note-rc/dev-proxy" target="_blank" rel="noopener">View Source</a>
+        </div>
+        <div class="trust-row" aria-label="Product highlights">
+          <span>DevProxy v1.9</span>
+          <span>English and Chinese UI</span>
+          <span>Local configuration storage</span>
+          <span>Built for whistle workflows</span>
+        </div>
+      </div>
+    </section>
+
+    <main>
+      <section id="features">
+        <div class="wrap">
+          <div class="section-head">
+            <p class="section-kicker">Core features</p>
+            <h2>Put everyday debugging actions in one clear toolbox</h2>
+            <p class="subtle">
+              DevProxy focuses on high-frequency workflows such as environment switching, production issue
+              reproduction, request rewriting, and script replacement. Save a rule, refresh the page, and it takes effect.
+            </p>
+          </div>
+          <div class="grid features">
+            <article class="feature-card">
+              <div class="tag blue">HDR</div>
+              <strong>Header Modify</strong>
+              <p>Add or override custom HTTP headers by URL match for authentication, debug flags, and environment simulation.</p>
+            </article>
+            <article class="feature-card">
+              <div class="tag teal">URL</div>
+              <strong>Route Replace</strong>
+              <p>Proxy API or asset requests with matching prefixes to target URLs, ideal for pointing production APIs to local services.</p>
+            </article>
+            <article class="feature-card">
+              <div class="tag amber">JS</div>
+              <strong>Script Replace</strong>
+              <p>Intercept specific JavaScript files and replace them with custom content for quick validation, reproduction, and fixes.</p>
+            </article>
+            <article class="feature-card">
+              <div class="tag rose">302</div>
+              <strong>JS Redirect</strong>
+              <p>Redirect selected JS file requests to another URL so production pages can load local or test versions.</p>
+            </article>
+            <article class="feature-card">
+              <div class="tag violet">PX</div>
+              <strong>Proxy Server</strong>
+              <p>Switch between system proxy, direct connection, and custom proxy servers. Pairs well with whistle for network debugging.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="workflow">
+        <div class="wrap split">
+          <div class="product-shot">
+            <img src="assets/workflow.svg" alt="DevProxy Chrome extension workflow preview" />
+          </div>
+          <div class="copy-block">
+            <p class="section-kicker">How it works</p>
+            <h2>Designed for real development flows, not buried configuration panels</h2>
+            <p class="subtle">
+              Click the extension icon in the browser toolbar for common actions, or open the configuration center to
+              maintain full rules and scenarios in one place.
+            </p>
+            <ul>
+              <li>Enable or disable individual rules for quick switching between tasks.</li>
+              <li>Use scenarios to keep separate production, staging, and local debugging combinations.</li>
+              <li>Proxy configuration applies immediately, reducing manual system changes and repeated refreshes.</li>
+              <li>English and Chinese UI with automatic defaults based on browser language.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="wrap">
+          <div class="section-head">
+            <p class="section-kicker">Use cases</p>
+            <h2>Built for these development debugging scenarios</h2>
+          </div>
+          <div class="grid use-cases">
+            <article class="case-card">
+              <h3>Reproduce production issues locally</h3>
+              <p>Redirect JS requests from a production page to a local dev server while keeping the real page context.</p>
+            </article>
+            <article class="case-card">
+              <h3>Debug APIs across environments</h3>
+              <p>Replace production or staging API prefixes with local services to reduce backend environment switching.</p>
+            </article>
+            <article class="case-card">
+              <h3>Simulate request headers</h3>
+              <p>Quickly add tokens, debug switches, language markers, or experiment flags to verify server behavior.</p>
+            </article>
+            <article class="case-card">
+              <h3>Capture traffic with whistle</h3>
+              <p>Point Chrome proxy settings to a local whistle port for request inspection, rewriting, and replay.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="install">
+        <div class="wrap">
+          <div class="section-head">
+            <p class="section-kicker">Quick start</p>
+            <h2>Start debugging in four steps</h2>
+          </div>
+          <div class="grid steps">
+            <article class="step">
+              <strong>Open the extension</strong>
+              <p>Click the DevProxy icon in the Chrome toolbar to open the popup or configuration center.</p>
+            </article>
+            <article class="step">
+              <strong>Choose a capability</strong>
+              <p>Select the feature you need: Header, Route, Script, Redirect, or Proxy.</p>
+            </article>
+            <article class="step">
+              <strong>Fill in the rule</strong>
+              <p>Set the match URL, target URL, header value, script content, or proxy server port.</p>
+            </article>
+            <article class="step">
+              <strong>Refresh the page</strong>
+              <p>Save and enable the rule, then refresh the target page to confirm requests and scripts behave as expected.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="permissions">
+        <div class="wrap">
+          <div class="section-head">
+            <p class="section-kicker">Permissions</p>
+            <h2>Transparent permission usage</h2>
+            <p class="subtle">
+              DevProxy requests permissions only to perform development debugging actions that users explicitly configure.
+              The notes below are suitable for Chrome Web Store review and user understanding.
+            </p>
+          </div>
+          <div class="grid permissions">
+            <article class="permission">
+              <code>storage</code>
+              <p>Stores rules, scenarios, language preferences, and proxy configuration in Chrome local storage for restoration on the next browser session.</p>
+            </article>
+            <article class="permission">
+              <code>declarativeNetRequest</code>
+              <p>Modifies request headers, redirects script resources, or replaces matching request URLs based on user configuration.</p>
+            </article>
+            <article class="permission">
+              <code>proxy</code>
+              <p>Switches between system proxy, direct connection, and custom proxy servers so developers can use local debugging proxies such as whistle.</p>
+            </article>
+            <article class="permission">
+              <code>&lt;all_urls&gt;</code>
+              <p>Allows rules to apply to sites users need to debug. Rules take effect only after users add and enable them.</p>
+            </article>
+            <article class="permission">
+              <code>content script</code>
+              <p>Runs script replacement logic early in page loading so developers can debug resources loaded during initial page startup.</p>
+            </article>
+            <article class="permission">
+              <code>web accessible resource</code>
+              <p>Exposes internal helper script resources used to complete user-configured script interception and replacement flows.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="privacy-band" id="privacy">
+        <div class="wrap">
+          <div class="section-head">
+            <p class="section-kicker">Privacy</p>
+            <h2>Privacy and data handling</h2>
+            <p class="subtle">
+              DevProxy is a local tool for development debugging. It does not include analytics SDKs and does not upload
+              browsing history, request content, or configuration to external servers.
+            </p>
+          </div>
+          <div class="privacy-list">
+            <div>
+              <strong>Stored locally</strong>
+              <p>Rules and preferences are saved in Chrome local storage and used only for extension features.</p>
+            </div>
+            <div>
+              <strong>User configured</strong>
+              <p>Header, route, script, redirect, and proxy rules are created, enabled, and deleted by users.</p>
+            </div>
+            <div>
+              <strong>No default tracking</strong>
+              <p>The extension has no default telemetry, ad tracking, or third-party data sale behavior.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="wrap">
+          <div class="section-head">
+            <p class="section-kicker">FAQ</p>
+            <h2>FAQ</h2>
+          </div>
+          <div class="faq">
+            <details>
+              <summary>What should I check if a rule does not work?</summary>
+              <p>Confirm the rule is enabled, the URL prefix matches correctly, and the target page has been refreshed. Script replacement rules should be enabled before the page loads.</p>
+            </details>
+            <details>
+              <summary>Can I enable multiple features at the same time?</summary>
+              <p>Yes. Header, Route, Script, Redirect, and Proxy features are independent and can be combined into different debugging scenarios.</p>
+            </details>
+            <details>
+              <summary>Which proxy tool is recommended?</summary>
+              <p>whistle is recommended. After starting whistle, enter the local address and port in DevProxy's proxy server settings.</p>
+            </details>
+            <details>
+              <summary>Should DevProxy stay enabled for everyday browsing?</summary>
+              <p>It is mainly intended for development debugging. Pause scenarios or disable rules when you are not debugging to avoid affecting normal browsing.</p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section class="final-cta">
+        <div class="wrap">
+          <h2>A lighter entry point for Chrome development debugging</h2>
+          <p>
+            DevProxy turns common proxy, redirect, and request rewriting capabilities into simple, controllable rules
+            that help frontend developers locate issues, switch environments, and validate fixes faster.
+          </p>
+          <div class="actions">
+            <a class="button primary" href="https://github.com/Note-rc/dev-proxy" target="_blank" rel="noopener">Visit GitHub</a>
+            <a class="button secondary" href="#permissions">View Permissions</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-inner">
+        <span>DevProxy v1.9 · Manifest V3 · MIT License</span>
+        <span>
+          Support:
+          <a href="https://github.com/Note-rc/dev-proxy/issues" target="_blank" rel="noopener">GitHub Issues</a>
+        </span>
+      </div>
+    </footer>
+  </body>
+</html>
